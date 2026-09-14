@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OaxLink - Conéctate</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #0f172a; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+    .card { background: #ffffff; width: 100%; max-width: 390px; border-radius: 28px; padding: 32px 24px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+    .avatar { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; margin: 0 auto 16px; border: 3px solid #e2e8f0; display: block; }
+    h1 { font-size: 1.35rem; color: #0f172a; margin-bottom: 6px; font-weight: 700; }
+    p { font-size: 0.9rem; color: #64748b; margin-bottom: 24px; }
+    .btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 15px 18px; border-radius: 14px; text-decoration: none; font-weight: 600; font-size: 0.95rem; margin-bottom: 12px; transition: transform 0.1s ease; }
+    .btn:active { transform: scale(0.98); }
+    .btn-google { background: #2563eb; color: #ffffff; box-shadow: 0 4px 14px rgba(37,99,235,0.3); }
+    .btn-ig { background: #e1306c; color: #ffffff; }
+    .btn-wa { background: #16a34a; color: #ffffff; }
+    .footer { margin-top: 24px; font-size: 0.75rem; color: #94a3b8; letter-spacing: 0.5px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <img id="biz-logo" src="" alt="Logo" class="avatar">
+    <h1 id="biz-name">Cargando...</h1>
+    <p id="biz-bio">Conéctate con nosotros en un toque</p>
+
+    <a id="btn-google" href="#" target="_blank" class="btn btn-google">
+      ⭐ Déjanos tu Reseña en Google
+    </a>
+
+    <a id="btn-ig" href="#" target="_blank" class="btn btn-ig">
+      📸 Síguenos en Instagram
+    </a>
+
+    <a id="btn-wa" href="#" target="_blank" class="btn btn-wa">
+      💬 Escríbenos por WhatsApp
+    </a>
+
+    <div class="footer">
+      Powered by <strong>OaxLink</strong>
+    </div>
+  </div>
+
+  <script>
+    // Base de datos local para pruebas rápidas
+    const businesses = {
+      cafe: {
+        name: "Café Santo Domingo",
+        bio: "El mejor café de especialidad del centro de Oaxaca.",
+        logo: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=200",
+        google: "https://maps.google.com",
+        instagram: "https://instagram.com",
+        whatsapp: "https://wa.me/529510000000?text=Hola,%20quiero%20hacer%20un%20pedido"
+      },
+      barber: {
+        name: "Barbería Tradicional Oaxaca",
+        bio: "Corte clásico, barba y estilo profesional.",
+        logo: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=200",
+        google: "https://maps.google.com",
+        instagram: "https://instagram.com",
+        whatsapp: "https://wa.me/529510000000?text=Hola,%20quiero%20agendar%20cita"
+      }
+    };
+
+    // Lee el parámetro de la URL: oaxlink.com/?b=cafe
+    const params = new URLSearchParams(window.location.search);
+    const key = params.get('b') || 'cafe';
+    const data = businesses[key] || businesses.cafe;
+
+    // Actualiza la vista
+    document.getElementById('biz-logo').src = data.logo;
+    document.getElementById('biz-name').textContent = data.name;
+    document.getElementById('biz-bio').textContent = data.bio;
+    document.getElementById('btn-google').href = data.google;
+    document.getElementById('btn-ig').href = data.instagram;
+    document.getElementById('btn-wa').href = data.whatsapp;
+  </script>
+</body>
+</html>
