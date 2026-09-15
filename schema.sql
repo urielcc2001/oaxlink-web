@@ -37,3 +37,6 @@ create table if not exists eventos (
 );
 
 create index if not exists eventos_negocio_idx on eventos(negocio_slug, created_at);
+
+-- Corre esto si tu tabla `negocios` ya existía antes de agregar TikTok al panel del dueño.
+alter table negocios add column if not exists tiktok text;
