@@ -33,7 +33,15 @@ export async function getContadores(slug: string): Promise<Contadores> {
 
 export type PuntoSerie = {
   fecha: string;
-  total: number;
+  scans: number;
+  google: number;
+  wa: number;
+};
+
+const TIPO_A_CAMPO: Record<string, keyof Omit<PuntoSerie, "fecha">> = {
+  scan: "scans",
+  click_google: "google",
+  click_wa: "wa"
 };
 
 export async function getSerieDiaria(slug: string, dias = 14): Promise<PuntoSerie[]> {
@@ -43,14 +51,19 @@ export async function getSerieDiaria(slug: string, dias = 14): Promise<PuntoSeri
 
   const { data } = await supabaseAdmin
     .from("eventos")
-    .select("created_at")
+    .select("tipo, created_at")
     .eq("negocio_slug", slug)
     .gte("created_at", desde.toISOString());
 
-  const conteoPorDia = new Map<string, number>();
+  const conteoPorDia = new Map<string, { scans: number; google: number; wa: number }>();
   for (const fila of data ?? []) {
+    const campo = TIPO_A_CAMPO[fila.tipo as string];
+    if (!campo) continue;
+
     const fecha = new Date(fila.created_at as string).toISOString().slice(0, 10);
-    conteoPorDia.set(fecha, (conteoPorDia.get(fecha) ?? 0) + 1);
+    const acumulado = conteoPorDia.get(fecha) ?? { scans: 0, google: 0, wa: 0 };
+    acumulado[campo] += 1;
+    conteoPorDia.set(fecha, acumulado);
   }
 
   const serie: PuntoSerie[] = [];
@@ -58,7 +71,8 @@ export async function getSerieDiaria(slug: string, dias = 14): Promise<PuntoSeri
     const dia = new Date(desde);
     dia.setDate(desde.getDate() + i);
     const fecha = dia.toISOString().slice(0, 10);
-    serie.push({ fecha, total: conteoPorDia.get(fecha) ?? 0 });
+    const acumulado = conteoPorDia.get(fecha) ?? { scans: 0, google: 0, wa: 0 };
+    serie.push({ fecha, ...acumulado });
   }
 
   return serie;

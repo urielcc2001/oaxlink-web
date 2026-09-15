@@ -19,26 +19,33 @@ export default async function DashboardNegocio({
 
   return (
     <div className="dash-page">
-      <h1 className="dash-title">{negocio.nombre}</h1>
+      <nav className="dash-nav">
+        <div className="dash-logo">
+          <span className="dash-logo-mark">OL</span>OaxLink
+        </div>
+        <div className="dash-nav-negocio">{negocio.nombre}</div>
+      </nav>
 
-      <div className="dash-cards">
-        <div className="dash-card">
-          <span className="dash-card-label">Escaneos</span>
-          <span className="dash-card-value">{contadores.scan}</span>
+      <div className="dash-content">
+        <div className="dash-cards">
+          <div className="dash-card">
+            <span className="dash-card-label">Escaneos</span>
+            <span className="dash-card-value">{contadores.scan}</span>
+          </div>
+          <div className="dash-card">
+            <span className="dash-card-label">Reseñas de Google</span>
+            <span className="dash-card-value">{contadores.click_google}</span>
+          </div>
+          <div className="dash-card">
+            <span className="dash-card-label">WhatsApp</span>
+            <span className="dash-card-value">{contadores.click_wa}</span>
+          </div>
         </div>
-        <div className="dash-card">
-          <span className="dash-card-label">Reseñas de Google</span>
-          <span className="dash-card-value">{contadores.click_google}</span>
-        </div>
-        <div className="dash-card">
-          <span className="dash-card-label">WhatsApp</span>
-          <span className="dash-card-value">{contadores.click_wa}</span>
-        </div>
-      </div>
 
-      <div className="dash-chart-card">
-        <h2 className="dash-chart-title">Eventos por día (últimos 14 días)</h2>
-        <GraficaSerie datos={serie} />
+        <div className="dash-chart-card">
+          <h2 className="dash-chart-title">Eventos por día (últimos 14 días)</h2>
+          <GraficaSerie datos={serie} />
+        </div>
       </div>
     </div>
   );
