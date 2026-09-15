@@ -1,24 +1,26 @@
 :root {
   --ink: #0b1220;
   --ink-2: #121c2e;
+  --ink-3: #1b2740;
   --gold: #d9a441;
   --teal: #2e8b77;
   --text: #e7e9ee;
   --muted: #8b93a7;
   --line: rgba(231, 233, 238, 0.12);
+  --line-hover: rgba(217, 164, 65, 0.45);
 }
 
 .mn-page {
   min-height: 100vh;
-  background: var(--ink);
   color: var(--text);
   font-family: "Inter", system-ui, sans-serif;
 }
 
-.mn-page h1 {
+.mn-page h1,
+.mn-page h2,
+.mn-page h3 {
   font-family: "Sora", system-ui, sans-serif;
   letter-spacing: -0.01em;
-  font-size: 1.4rem;
 }
 
 .mn-centrado {
@@ -30,24 +32,36 @@
   text-align: center;
   min-height: 100vh;
   padding: 2rem;
+  background: var(--ink);
 }
 
-.mn-nav {
+/* SHELL: sidebar + contenido */
+.mn-shell {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 72px;
-  padding: 0 28px;
-  border-bottom: 1px solid var(--line);
+  min-height: 100vh;
+  background: var(--ink);
 }
 
-.mn-logo {
+.mn-sidebar {
+  width: 230px;
+  flex-shrink: 0;
+  background: var(--ink-2);
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.mn-sidebar-logo {
   display: flex;
   align-items: center;
   gap: 10px;
   font-family: "Sora", system-ui, sans-serif;
   font-weight: 700;
   font-size: 1.05rem;
+  padding: 1.5rem 1.25rem;
 }
 
 .mn-logo-mark {
@@ -61,54 +75,209 @@
   font-size: 0.85rem;
   color: var(--ink);
   font-weight: 800;
+  flex-shrink: 0;
 }
 
-.mn-nav-right {
+.mn-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0.5rem 0.75rem;
+}
+
+.mn-sidebar-item {
   display: flex;
   align-items: center;
-  gap: 16px;
-}
-
-.mn-nav-negocio {
+  gap: 10px;
+  background: transparent;
+  border: none;
+  border-left: 3px solid transparent;
+  border-radius: 8px;
+  padding: 11px 12px;
   color: var(--muted);
   font-size: 0.92rem;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.mn-sidebar-item:hover {
+  color: var(--text);
+}
+
+.mn-sidebar-item.is-active {
+  background: var(--ink-3);
+  border-left-color: var(--gold);
+  color: var(--text);
+}
+
+.mn-sidebar-item .icon {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.mn-sidebar-footer {
+  margin-top: auto;
+  border-top: 1px solid var(--line);
+  padding: 1.1rem 1.25rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.mn-sidebar-negocio {
+  color: var(--muted);
+  font-size: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .mn-btn-logout {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   background: transparent;
   border: 1px solid var(--line);
   color: var(--text);
   border-radius: 8px;
-  padding: 8px 16px;
+  padding: 8px 14px;
   font-size: 0.85rem;
   cursor: pointer;
   font-family: inherit;
+  transition: border-color 0.15s ease;
 }
 
 .mn-btn-logout:hover {
-  border-color: var(--muted);
+  border-color: var(--line-hover);
 }
 
-.mn-content {
-  padding: 2.5rem 1.5rem 3rem;
-  max-width: 680px;
+/* MAIN */
+.mn-main {
+  flex: 1;
+  min-width: 0;
+  background: radial-gradient(1100px circle at 0% 0%, var(--ink-2) 0%, var(--ink) 55%);
+}
+
+.mn-main-content {
+  max-width: 820px;
   margin: 0 auto;
+  padding: 2.75rem 2rem 3.5rem;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.75rem;
 }
 
-.mn-form {
+.mn-section-title {
+  font-size: 1.4rem;
+}
+
+/* Tarjetas — base compartida */
+.mn-card,
+.mn-counter-card,
+.mn-metrics-card,
+.mn-form-card {
   background: var(--ink-2);
   border: 1px solid var(--line);
   border-radius: 16px;
+  transition: border-color 0.2s ease;
+}
+
+.mn-card:hover,
+.mn-counter-card:hover,
+.mn-metrics-card:hover,
+.mn-form-card:hover {
+  border-color: var(--line-hover);
+}
+
+/* Contadores */
+.mn-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.mn-counter-card {
+  position: relative;
+  overflow: hidden;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.mn-counter-icon {
+  position: absolute;
+  top: 0.2rem;
+  right: 0.5rem;
+  font-size: 3.4rem;
+  line-height: 1;
+  opacity: 0.1;
+}
+
+.mn-card-label {
+  position: relative;
+  z-index: 1;
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.mn-card-value {
+  position: relative;
+  z-index: 1;
+  font-family: "Sora", system-ui, sans-serif;
+  font-size: 2.75rem;
+  font-weight: 800;
+  color: var(--gold);
+  text-shadow: 0 2px 16px rgba(217, 164, 65, 0.35);
+}
+
+/* Tarjeta de gráfica */
+.mn-metrics-card {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.mn-chart-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.mn-chart-title {
+  font-size: 1.05rem;
+}
+
+.mn-chart-sub {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* Formulario de perfil */
+.mn-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.mn-form-card {
   padding: 1.75rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.mn-form label {
+.mn-form-card-title {
+  font-size: 1.05rem;
+  margin-bottom: 0.2rem;
+}
+
+.mn-form-card label {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
@@ -116,8 +285,8 @@
   color: var(--muted);
 }
 
-.mn-form input,
-.mn-form textarea {
+.mn-form-card input,
+.mn-form-card textarea {
   background: var(--ink);
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -127,13 +296,13 @@
   font-family: inherit;
 }
 
-.mn-form input:focus,
-.mn-form textarea:focus {
+.mn-form-card input:focus,
+.mn-form-card textarea:focus {
   outline: none;
   border-color: var(--gold);
 }
 
-.mn-form textarea {
+.mn-form-card textarea {
   min-height: 90px;
   resize: vertical;
 }
@@ -172,11 +341,12 @@
 }
 
 .mn-btn-guardar {
+  align-self: flex-start;
   background: var(--gold);
   color: var(--ink);
   border: none;
   border-radius: 10px;
-  padding: 12px;
+  padding: 12px 28px;
   font-weight: 600;
   font-size: 0.95rem;
   cursor: pointer;
@@ -187,53 +357,68 @@
   cursor: default;
 }
 
-.mn-metrics-card {
-  background: var(--ink-2);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 1.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
+/* RESPONSIVE: sidebar colapsa arriba */
+@media (max-width: 760px) {
+  .mn-shell {
+    flex-direction: column;
+  }
 
-.mn-metrics-title {
-  font-family: "Sora", system-ui, sans-serif;
-  font-size: 1.1rem;
-}
+  .mn-sidebar {
+    width: 100%;
+    height: auto;
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    flex-direction: row;
+    align-items: center;
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+  }
 
-.mn-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 1rem;
-}
+  .mn-sidebar-logo {
+    padding: 0.75rem 1rem;
+  }
 
-.mn-card {
-  background: var(--ink);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 1.1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
+  .mn-sidebar-logo span:last-child {
+    display: none;
+  }
 
-.mn-card-label {
-  font-size: 0.8rem;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
+  .mn-sidebar-nav {
+    flex-direction: row;
+    flex: 1;
+    padding: 0.5rem;
+    gap: 4px;
+  }
 
-.mn-card-value {
-  font-family: "Sora", system-ui, sans-serif;
-  font-size: 2.25rem;
-  font-weight: 700;
-  color: var(--gold);
-}
+  .mn-sidebar-item {
+    flex: 1;
+    justify-content: center;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    border-radius: 8px 8px 0 0;
+  }
 
-.mn-chart-title {
-  margin: 0 0 1rem;
-  font-size: 0.9rem;
-  color: var(--muted);
+  .mn-sidebar-item.is-active {
+    border-bottom-color: var(--gold);
+  }
+
+  .mn-sidebar-item .label {
+    display: none;
+  }
+
+  .mn-sidebar-footer {
+    margin-top: 0;
+    border-top: none;
+    flex-direction: row;
+    align-items: center;
+    padding: 0.5rem 1rem 0.5rem 0;
+  }
+
+  .mn-sidebar-negocio {
+    display: none;
+  }
+
+  .mn-main-content {
+    padding: 1.75rem 1.25rem 2.5rem;
+  }
 }
