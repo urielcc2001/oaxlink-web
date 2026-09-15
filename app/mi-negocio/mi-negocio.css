@@ -340,6 +340,43 @@
   color: var(--teal);
 }
 
+.mn-mensaje-error {
+  color: #e07a7a;
+}
+
+.mn-pdf-actual {
+  color: var(--gold);
+  font-size: 0.85rem;
+  width: fit-content;
+}
+
+.mn-pdf-actual:hover {
+  text-decoration: underline;
+}
+
+.mn-pdf-upload {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mn-pdf-upload input[type="file"] {
+  flex: 1;
+  background: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+
+.mn-pdf-subiendo {
+  color: var(--gold);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
 .mn-btn-guardar {
   align-self: flex-start;
   background: var(--gold);

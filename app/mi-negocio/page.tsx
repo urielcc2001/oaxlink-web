@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import type { PuntoSerie } from "@/lib/eventos";
@@ -60,6 +60,8 @@ export default function MiNegocioPage() {
   const [mensaje, setMensaje] = useState<string | null>(null);
   const [metricas, setMetricas] = useState<Metricas | null>(null);
   const [seccion, setSeccion] = useState<Seccion>("metricas");
+  const [subiendoPdf, setSubiendoPdf] = useState(false);
+  const [errorPdf, setErrorPdf] = useState<string | null>(null);
 
   useEffect(() => {
     async function cargar() {
@@ -110,6 +112,33 @@ export default function MiNegocioPage() {
 
   function handleChange(campo: keyof FormNegocio, valor: string) {
     setForm((prev) => ({ ...prev, [campo]: valor }));
+  }
+
+  async function handlePdfChange(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !negocio) return;
+
+    setErrorPdf(null);
+    setSubiendoPdf(true);
+
+    const path = `${negocio.slug}/${Date.now()}-${file.name}`;
+    const { error: uploadError } = await supabase.storage
+      .from("menus")
+      .upload(path, file, { upsert: true });
+
+    if (uploadError) {
+      setSubiendoPdf(false);
+      setErrorPdf("No se pudo subir el PDF. Intenta de nuevo.");
+      return;
+    }
+
+    const {
+      data: { publicUrl }
+    } = supabase.storage.from("menus").getPublicUrl(path);
+
+    setForm((prev) => ({ ...prev, menu_pdf_url: publicUrl }));
+    setSubiendoPdf(false);
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -235,11 +264,22 @@ export default function MiNegocioPage() {
                     <textarea value={form.bio} onChange={(e) => handleChange("bio", e.target.value)} />
                   </label>
                   <label>
-                    Menú (PDF)
-                    <input
-                      value={form.menu_pdf_url}
-                      onChange={(e) => handleChange("menu_pdf_url", e.target.value)}
-                    />
+                    Menú / avisos (PDF)
+                    {form.menu_pdf_url && (
+                      <a
+                        href={form.menu_pdf_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mn-pdf-actual"
+                      >
+                        Ver PDF actual
+                      </a>
+                    )}
+                    <div className="mn-pdf-upload">
+                      <input type="file" accept="application/pdf" onChange={handlePdfChange} />
+                      {subiendoPdf && <span className="mn-pdf-subiendo">Subiendo...</span>}
+                    </div>
+                    {errorPdf && <p className="mn-mensaje mn-mensaje-error">{errorPdf}</p>}
                   </label>
                 </div>
 
@@ -299,7 +339,7 @@ export default function MiNegocioPage() {
 
                 {mensaje && <p className="mn-mensaje">{mensaje}</p>}
 
-                <button type="submit" className="mn-btn-guardar" disabled={guardando}>
+                <button type="submit" className="mn-btn-guardar" disabled={guardando || subiendoPdf}>
                   {guardando ? "Guardando..." : "Guardar cambios"}
                 </button>
               </form>
