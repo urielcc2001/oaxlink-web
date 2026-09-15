@@ -1,5 +1,6 @@
-// Consultas de métricas para el dashboard, usando supabase-admin
-// (bypassa RLS) — solo se debe llamar desde server components.
+// Consultas de métricas para el panel del dueño (/mi-negocio), usando
+// supabase-admin (bypassa RLS) — solo se debe llamar desde server components
+// o route handlers.
 
 import { supabaseAdmin } from "./supabase-admin";
 

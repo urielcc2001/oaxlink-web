@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import { getContadores } from "@/lib/eventos";
+import { getContadores, getSerieDiaria } from "@/lib/eventos";
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get("authorization") ?? "";
@@ -26,11 +26,15 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Negocio no encontrado" }, { status: 404 });
   }
 
-  const contadores = await getContadores(negocio.slug);
+  const [contadores, serie] = await Promise.all([
+    getContadores(negocio.slug),
+    getSerieDiaria(negocio.slug, 14)
+  ]);
 
   return NextResponse.json({
     scans: contadores.scan,
     clicksGoogle: contadores.click_google,
-    clicksWhatsapp: contadores.click_wa
+    clicksWhatsapp: contadores.click_wa,
+    serie
   });
 }

@@ -3,6 +3,9 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import type { PuntoSerie } from "@/lib/eventos";
+import { GraficaSerie } from "./grafica-serie";
+import { IconoFacebook, IconoGoogle, IconoInstagram, IconoTikTok, IconoWhatsApp } from "./iconos";
 import "./mi-negocio.css";
 
 type NegocioRow = {
@@ -32,6 +35,7 @@ type Metricas = {
   scans: number;
   clicksGoogle: number;
   clicksWhatsapp: number;
+  serie: PuntoSerie[];
 };
 
 const FORM_VACIO: FormNegocio = {
@@ -144,9 +148,12 @@ export default function MiNegocioPage() {
         <div className="mn-logo">
           <span className="mn-logo-mark">OL</span>OaxLink
         </div>
-        <button className="mn-btn-logout" onClick={handleLogout}>
-          Cerrar sesión
-        </button>
+        <div className="mn-nav-right">
+          <span className="mn-nav-negocio">{negocio.nombre}</span>
+          <button className="mn-btn-logout" onClick={handleLogout}>
+            Cerrar sesión
+          </button>
+        </div>
       </nav>
 
       <div className="mn-content">
@@ -163,26 +170,44 @@ export default function MiNegocioPage() {
           </label>
           <label>
             WhatsApp
-            <input value={form.whatsapp} onChange={(e) => handleChange("whatsapp", e.target.value)} />
+            <div className="mn-input-icon">
+              <IconoWhatsApp />
+              <input value={form.whatsapp} onChange={(e) => handleChange("whatsapp", e.target.value)} />
+            </div>
           </label>
           <label>
             Facebook
-            <input value={form.facebook} onChange={(e) => handleChange("facebook", e.target.value)} />
+            <div className="mn-input-icon">
+              <IconoFacebook />
+              <input value={form.facebook} onChange={(e) => handleChange("facebook", e.target.value)} />
+            </div>
           </label>
           <label>
             Instagram
-            <input value={form.instagram} onChange={(e) => handleChange("instagram", e.target.value)} />
+            <div className="mn-input-icon">
+              <IconoInstagram />
+              <input
+                value={form.instagram}
+                onChange={(e) => handleChange("instagram", e.target.value)}
+              />
+            </div>
           </label>
           <label>
             TikTok
-            <input value={form.tiktok} onChange={(e) => handleChange("tiktok", e.target.value)} />
+            <div className="mn-input-icon">
+              <IconoTikTok />
+              <input value={form.tiktok} onChange={(e) => handleChange("tiktok", e.target.value)} />
+            </div>
           </label>
           <label>
             Reseña de Google
-            <input
-              value={form.google_review_url}
-              onChange={(e) => handleChange("google_review_url", e.target.value)}
-            />
+            <div className="mn-input-icon">
+              <IconoGoogle />
+              <input
+                value={form.google_review_url}
+                onChange={(e) => handleChange("google_review_url", e.target.value)}
+              />
+            </div>
           </label>
           <label>
             Menú (PDF)
@@ -199,22 +224,33 @@ export default function MiNegocioPage() {
           </button>
         </form>
 
-        {metricas && (
+        <div className="mn-metrics-card">
+          <h2 className="mn-metrics-title">Métricas</h2>
+
           <div className="mn-cards">
             <div className="mn-card">
               <span className="mn-card-label">Escaneos</span>
-              <span className="mn-card-value">{metricas.scans}</span>
+              <span className="mn-card-value">{metricas?.scans ?? "—"}</span>
             </div>
             <div className="mn-card">
               <span className="mn-card-label">Reseñas de Google</span>
-              <span className="mn-card-value">{metricas.clicksGoogle}</span>
+              <span className="mn-card-value">{metricas?.clicksGoogle ?? "—"}</span>
             </div>
             <div className="mn-card">
               <span className="mn-card-label">WhatsApp</span>
-              <span className="mn-card-value">{metricas.clicksWhatsapp}</span>
+              <span className="mn-card-value">{metricas?.clicksWhatsapp ?? "—"}</span>
             </div>
           </div>
-        )}
+
+          <div>
+            <h3 className="mn-chart-title">Eventos por día (últimos 14 días)</h3>
+            {metricas ? (
+              <GraficaSerie datos={metricas.serie} />
+            ) : (
+              <p className="mn-mensaje">Cargando métricas...</p>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

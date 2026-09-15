@@ -63,6 +63,17 @@
   font-weight: 800;
 }
 
+.mn-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.mn-nav-negocio {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
 .mn-btn-logout {
   background: transparent;
   border: 1px solid var(--line);
@@ -80,7 +91,7 @@
 
 .mn-content {
   padding: 2.5rem 1.5rem 3rem;
-  max-width: 640px;
+  max-width: 680px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -127,6 +138,34 @@
   resize: vertical;
 }
 
+.mn-input-icon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 12px;
+}
+
+.mn-input-icon svg {
+  flex-shrink: 0;
+}
+
+.mn-input-icon input {
+  border: none;
+  background: transparent;
+  padding: 10px 0;
+}
+
+.mn-input-icon:focus-within {
+  border-color: var(--gold);
+}
+
+.mn-input-icon input:focus {
+  outline: none;
+}
+
 .mn-mensaje {
   font-size: 0.85rem;
   color: var(--teal);
@@ -148,6 +187,21 @@
   cursor: default;
 }
 
+.mn-metrics-card {
+  background: var(--ink-2);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.mn-metrics-title {
+  font-family: "Sora", system-ui, sans-serif;
+  font-size: 1.1rem;
+}
+
 .mn-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -155,10 +209,10 @@
 }
 
 .mn-card {
-  background: var(--ink-2);
+  background: var(--ink);
   border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 1.25rem;
+  border-radius: 12px;
+  padding: 1.1rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -176,4 +230,10 @@
   font-size: 2.25rem;
   font-weight: 700;
   color: var(--gold);
+}
+
+.mn-chart-title {
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+  color: var(--muted);
 }
