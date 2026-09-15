@@ -3,6 +3,8 @@ import { getNegocio, registrarEvento } from "@/lib/negocios";
 import { BotonesTarjeta } from "./botones-tarjeta";
 import "./card.css";
 
+export const dynamic = "force-dynamic";
+
 export default async function TarjetaNegocio({
   params
 }: {

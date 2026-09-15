@@ -1,6 +1,8 @@
 import { redirect, notFound } from "next/navigation";
 import { resolverPlaca } from "@/lib/placas";
 
+export const dynamic = "force-dynamic";
+
 export default async function Placa({ params }: { params: { id: string } }) {
   const slug = await resolverPlaca(params.id);
 
