@@ -354,34 +354,34 @@ export default function AdminPage() {
   }
 
   if (verificando) {
-    return <div className="ad-page ad-centrado">Verificando acceso...</div>;
+    return <div className="admin-page admin-centrado">Verificando acceso...</div>;
   }
 
   return (
-    <div className="ad-page ad-shell">
-      <aside className="ad-sidebar">
-        <div className="ad-sidebar-logo">
-          <span className="ad-logo-mark">OL</span>
+    <div className="admin-page admin-shell">
+      <aside className="admin-sidebar">
+        <div className="admin-sidebar-logo">
+          <span className="admin-logo-mark">OL</span>
           <span>OaxLink · Admin</span>
         </div>
 
-        <nav className="ad-sidebar-nav">
+        <nav className="admin-sidebar-nav">
           <button
-            className={`ad-sidebar-item ${seccion === "registrar" ? "is-active" : ""}`}
+            className={`admin-sidebar-item ${seccion === "registrar" ? "is-active" : ""}`}
             onClick={() => setSeccion("registrar")}
           >
             <span className="icon">➕</span>
             <span className="label">Registrar negocio</span>
           </button>
           <button
-            className={`ad-sidebar-item ${seccion === "negocios" ? "is-active" : ""}`}
+            className={`admin-sidebar-item ${seccion === "negocios" ? "is-active" : ""}`}
             onClick={() => setSeccion("negocios")}
           >
             <span className="icon">📋</span>
             <span className="label">Negocios</span>
           </button>
           <button
-            className={`ad-sidebar-item ${seccion === "placa" ? "is-active" : ""}`}
+            className={`admin-sidebar-item ${seccion === "placa" ? "is-active" : ""}`}
             onClick={() => setSeccion("placa")}
           >
             <span className="icon">🔗</span>
@@ -389,23 +389,23 @@ export default function AdminPage() {
           </button>
         </nav>
 
-        <div className="ad-sidebar-footer">
-          <span className="ad-sidebar-email">{emailAdmin}</span>
-          <button className="ad-btn-logout" onClick={handleLogout}>
+        <div className="admin-sidebar-footer">
+          <span className="admin-sidebar-email">{emailAdmin}</span>
+          <button className="admin-btn-logout" onClick={handleLogout}>
             🚪 Cerrar sesión
           </button>
         </div>
       </aside>
 
-      <main className="ad-main">
-        <div className="ad-main-content">
+      <main className="admin-main">
+        <div className="admin-main-content">
           {seccion === "registrar" && (
             <>
-              <h1 className="ad-section-title">Registrar negocio</h1>
+              <h1 className="admin-section-title">Registrar negocio</h1>
 
-              <form className="ad-form" onSubmit={handleSubmitNegocio}>
-                <div className="ad-form-card">
-                  <h3 className="ad-form-card-title">Información básica</h3>
+              <form className="admin-form" onSubmit={handleSubmitNegocio}>
+                <div className="admin-form-card">
+                  <h3 className="admin-form-card-title">Información básica</h3>
                   <label>
                     Slug
                     <input
@@ -446,11 +446,11 @@ export default function AdminPage() {
                   </label>
                 </div>
 
-                <div className="ad-form-card">
-                  <h3 className="ad-form-card-title">Redes y contacto</h3>
+                <div className="admin-form-card">
+                  <h3 className="admin-form-card-title">Redes y contacto</h3>
                   <label>
                     WhatsApp
-                    <div className="ad-input-icon">
+                    <div className="admin-input-icon">
                       <IconoWhatsApp />
                       <input
                         value={formNegocio.whatsapp}
@@ -460,7 +460,7 @@ export default function AdminPage() {
                   </label>
                   <label>
                     Reseña de Google
-                    <div className="ad-input-icon">
+                    <div className="admin-input-icon">
                       <IconoGoogle />
                       <input
                         value={formNegocio.google_review_url}
@@ -470,7 +470,7 @@ export default function AdminPage() {
                   </label>
                   <label>
                     Facebook
-                    <div className="ad-input-icon">
+                    <div className="admin-input-icon">
                       <IconoFacebook />
                       <input
                         value={formNegocio.facebook}
@@ -480,7 +480,7 @@ export default function AdminPage() {
                   </label>
                   <label>
                     Instagram
-                    <div className="ad-input-icon">
+                    <div className="admin-input-icon">
                       <IconoInstagram />
                       <input
                         value={formNegocio.instagram}
@@ -490,7 +490,7 @@ export default function AdminPage() {
                   </label>
                   <label>
                     TikTok
-                    <div className="ad-input-icon">
+                    <div className="admin-input-icon">
                       <IconoTikTok />
                       <input
                         value={formNegocio.tiktok}
@@ -501,12 +501,12 @@ export default function AdminPage() {
                 </div>
 
                 {mensajeNegocio && (
-                  <p className={`ad-mensaje ${mensajeNegocio.tipo === "error" ? "ad-mensaje-error" : ""}`}>
+                  <p className={`admin-mensaje ${mensajeNegocio.tipo === "error" ? "admin-mensaje-error" : ""}`}>
                     {mensajeNegocio.texto}
                   </p>
                 )}
 
-                <button type="submit" className="ad-btn-guardar" disabled={guardandoNegocio}>
+                <button type="submit" className="admin-btn-guardar" disabled={guardandoNegocio}>
                   {guardandoNegocio ? "Creando..." : "Crear negocio"}
                 </button>
               </form>
@@ -515,12 +515,12 @@ export default function AdminPage() {
 
           {seccion === "negocios" && (
             <>
-              <h1 className="ad-section-title">Negocios</h1>
+              <h1 className="admin-section-title">Negocios</h1>
 
-              <div className="ad-card">
-                <h2 className="ad-card-title">Negocios registrados</h2>
-                <div className="ad-tabla-wrap">
-                  <table className="ad-tabla">
+              <div className="admin-card">
+                <h2 className="admin-card-title">Negocios registrados</h2>
+                <div className="admin-tabla-wrap">
+                  <table className="admin-tabla">
                     <thead>
                       <tr>
                         <th>Nombre</th>
@@ -539,12 +539,12 @@ export default function AdminPage() {
                             <td>{n.plan ?? "—"}</td>
                             <td>{n.estado ?? "—"}</td>
                             <td>
-                              <div className="ad-tabla-acciones">
-                                <button className="ad-btn-editar" onClick={() => toggleEditar(n)}>
+                              <div className="admin-tabla-acciones">
+                                <button className="admin-btn-editar" onClick={() => toggleEditar(n)}>
                                   {editandoSlug === n.slug ? "Cerrar" : "Editar"}
                                 </button>
                                 <button
-                                  className="ad-btn-eliminar"
+                                  className="admin-btn-eliminar"
                                   onClick={() => handleEliminarNegocio(n.slug, n.nombre)}
                                   disabled={eliminando === n.slug}
                                 >
@@ -554,9 +554,9 @@ export default function AdminPage() {
                             </td>
                           </tr>
                           {editandoSlug === n.slug && (
-                            <tr className="ad-tabla-edicion-row">
+                            <tr className="admin-tabla-edicion-row">
                               <td colSpan={5}>
-                                <form className="ad-edicion-form" onSubmit={handleGuardarEdicion}>
+                                <form className="admin-edicion-form" onSubmit={handleGuardarEdicion}>
                                   <label>
                                     Nombre
                                     <input
@@ -573,7 +573,7 @@ export default function AdminPage() {
                                       onChange={(e) => handleChangeEdicion("email_dueno", e.target.value)}
                                     />
                                   </label>
-                                  <label className="ad-form-full">
+                                  <label className="admin-form-full">
                                     Bio
                                     <input
                                       value={formEdicion.bio}
@@ -625,18 +625,18 @@ export default function AdminPage() {
                                     />
                                   </label>
 
-                                  <div className="ad-edicion-acciones">
+                                  <div className="admin-edicion-acciones">
                                     <button
                                       type="submit"
-                                      className="ad-btn-guardar"
+                                      className="admin-btn-guardar"
                                       disabled={guardandoEdicion}
                                     >
                                       {guardandoEdicion ? "Guardando..." : "Guardar"}
                                     </button>
                                     {mensajeEdicion && (
                                       <p
-                                        className={`ad-mensaje ${
-                                          mensajeEdicion.tipo === "error" ? "ad-mensaje-error" : ""
+                                        className={`admin-mensaje ${
+                                          mensajeEdicion.tipo === "error" ? "admin-mensaje-error" : ""
                                         }`}
                                       >
                                         {mensajeEdicion.texto}
@@ -651,7 +651,7 @@ export default function AdminPage() {
                       ))}
                       {negocios.length === 0 && (
                         <tr>
-                          <td colSpan={5} className="ad-tabla-vacio">
+                          <td colSpan={5} className="admin-tabla-vacio">
                             Todavía no hay negocios registrados.
                           </td>
                         </tr>
@@ -665,10 +665,10 @@ export default function AdminPage() {
 
           {seccion === "placa" && (
             <>
-              <h1 className="ad-section-title">Vincular placa</h1>
+              <h1 className="admin-section-title">Vincular placa</h1>
 
-              <form className="ad-form" onSubmit={handleSubmitPlaca}>
-                <div className="ad-form-card">
+              <form className="admin-form" onSubmit={handleSubmitPlaca}>
+                <div className="admin-form-card">
                   <label>
                     ID de placa
                     <input
@@ -705,12 +705,12 @@ export default function AdminPage() {
                   </label>
 
                   {mensajePlaca && (
-                    <p className={`ad-mensaje ${mensajePlaca.tipo === "error" ? "ad-mensaje-error" : ""}`}>
+                    <p className={`admin-mensaje ${mensajePlaca.tipo === "error" ? "admin-mensaje-error" : ""}`}>
                       {mensajePlaca.texto}
                     </p>
                   )}
 
-                  <button type="submit" className="ad-btn-guardar" disabled={guardandoPlaca}>
+                  <button type="submit" className="admin-btn-guardar" disabled={guardandoPlaca}>
                     {guardandoPlaca ? "Vinculando..." : "Vincular placa"}
                   </button>
                 </div>
