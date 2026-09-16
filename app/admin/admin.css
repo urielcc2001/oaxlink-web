@@ -160,3 +160,68 @@
   opacity: 0.6;
   cursor: default;
 }
+
+.ad-section {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 1.5rem 3.5rem;
+}
+
+.ad-tabla-wrap {
+  overflow-x: auto;
+}
+
+.ad-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.ad-tabla th {
+  text-align: left;
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+  padding: 0 12px 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.ad-tabla td {
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.ad-tabla tr:last-child td {
+  border-bottom: none;
+}
+
+.ad-tabla-vacio {
+  color: var(--muted);
+  text-align: center;
+  padding: 1.5rem !important;
+}
+
+.ad-btn-eliminar {
+  background: transparent;
+  border: 1px solid rgba(224, 122, 122, 0.4);
+  color: #e07a7a;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.ad-btn-eliminar:hover {
+  background: rgba(224, 122, 122, 0.1);
+  border-color: #e07a7a;
+}
+
+.ad-btn-eliminar:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

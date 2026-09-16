@@ -1,22 +1,11 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import { verificarAdmin } from "@/lib/admin-auth";
 
 export async function POST(request: Request) {
-  const authHeader = request.headers.get("authorization") ?? "";
-  const token = authHeader.replace(/^Bearer\s+/i, "").trim();
-
-  if (!token) {
-    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-  }
-
-  const { data: userData, error: userError } = await supabase.auth.getUser(token);
-  if (userError || !userData.user?.email) {
-    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-  }
-
-  if (userData.user.email !== process.env.ADMIN_EMAIL) {
-    return NextResponse.json({ error: "Prohibido" }, { status: 403 });
+  const verificacion = await verificarAdmin(request);
+  if (!verificacion.ok) {
+    return NextResponse.json({ error: verificacion.error }, { status: verificacion.status });
   }
 
   const body = await request.json().catch(() => null);

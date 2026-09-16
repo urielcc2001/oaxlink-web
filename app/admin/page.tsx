@@ -31,7 +31,7 @@ const NEGOCIO_VACIO: NegocioForm = {
   email_dueno: ""
 };
 
-type NegocioOpcion = { slug: string; nombre: string };
+type NegocioAdmin = { slug: string; nombre: string; plan: string | null; estado: string | null };
 
 type PlacaForm = {
   id_placa: string;
@@ -50,7 +50,8 @@ type Mensaje = { tipo: "ok" | "error"; texto: string };
 export default function AdminPage() {
   const router = useRouter();
   const [verificando, setVerificando] = useState(true);
-  const [negocios, setNegocios] = useState<NegocioOpcion[]>([]);
+  const [negocios, setNegocios] = useState<NegocioAdmin[]>([]);
+  const [eliminando, setEliminando] = useState<string | null>(null);
 
   const [formNegocio, setFormNegocio] = useState<NegocioForm>(NEGOCIO_VACIO);
   const [guardandoNegocio, setGuardandoNegocio] = useState(false);
@@ -75,8 +76,11 @@ export default function AdminPage() {
 
       setVerificando(false);
 
-      const { data } = await supabase.from("negocios").select("slug, nombre").order("nombre");
-      if (data) setNegocios(data as NegocioOpcion[]);
+      const res = await fetch("/api/admin/negocios", {
+        headers: { Authorization: `Bearer ${session.access_token}` }
+      });
+      const datos = await res.json().catch(() => null);
+      if (res.ok && datos?.negocios) setNegocios(datos.negocios as NegocioAdmin[]);
     }
 
     verificar();
@@ -118,7 +122,10 @@ export default function AdminPage() {
       return;
     }
 
-    setNegocios((prev) => [...prev, { slug: formNegocio.slug, nombre: formNegocio.nombre }]);
+    setNegocios((prev) => [
+      ...prev,
+      { slug: formNegocio.slug, nombre: formNegocio.nombre, plan: "basico", estado: "activo" }
+    ]);
     setMensajeNegocio({ tipo: "ok", texto: `Negocio creado: oaxlink.com/${formNegocio.slug}` });
     setFormNegocio(NEGOCIO_VACIO);
   }
@@ -164,6 +171,39 @@ export default function AdminPage() {
       texto: `Placa ${formPlaca.id_placa} vinculada a ${formPlaca.negocio_slug}.`
     });
     setFormPlaca(PLACA_VACIA);
+  }
+
+  async function handleEliminarNegocio(slug: string, nombre: string) {
+    const confirmado = window.confirm(
+      `¿Seguro que quieres eliminar a ${nombre}? Esto borra también sus placas y eventos.`
+    );
+    if (!confirmado) return;
+
+    const {
+      data: { session }
+    } = await supabase.auth.getSession();
+
+    if (!session) {
+      router.replace("/login");
+      return;
+    }
+
+    setEliminando(slug);
+
+    const res = await fetch(`/api/admin/negocios/${slug}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${session.access_token}` }
+    });
+
+    setEliminando(null);
+
+    if (!res.ok) {
+      const datos = await res.json().catch(() => null);
+      window.alert(datos?.error ?? "No se pudo eliminar el negocio.");
+      return;
+    }
+
+    setNegocios((prev) => prev.filter((n) => n.slug !== slug));
   }
 
   async function handleLogout() {
@@ -321,6 +361,51 @@ export default function AdminPage() {
               {guardandoPlaca ? "Vinculando..." : "Vincular placa"}
             </button>
           </form>
+        </div>
+      </div>
+
+      <div className="ad-section">
+        <div className="ad-card">
+          <h2 className="ad-card-title">Negocios registrados</h2>
+          <div className="ad-tabla-wrap">
+            <table className="ad-tabla">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Slug</th>
+                  <th>Plan</th>
+                  <th>Estado</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {negocios.map((n) => (
+                  <tr key={n.slug}>
+                    <td>{n.nombre}</td>
+                    <td>{n.slug}</td>
+                    <td>{n.plan ?? "—"}</td>
+                    <td>{n.estado ?? "—"}</td>
+                    <td>
+                      <button
+                        className="ad-btn-eliminar"
+                        onClick={() => handleEliminarNegocio(n.slug, n.nombre)}
+                        disabled={eliminando === n.slug}
+                      >
+                        {eliminando === n.slug ? "Eliminando..." : "Eliminar"}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {negocios.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="ad-tabla-vacio">
+                      Todavía no hay negocios registrados.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
