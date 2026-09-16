@@ -1,5 +1,6 @@
 // Capa de datos de negocios, conectada a la tabla `negocios` de Supabase.
 
+import { unstable_noStore as noStore } from "next/cache";
 import { supabase } from "./supabase";
 
 export type Negocio = {
@@ -41,6 +42,8 @@ function mapRow(row: NegocioRow): Negocio {
 }
 
 export async function getNegocio(slug: string): Promise<Negocio | null> {
+  noStore();
+
   const { data, error } = await supabase
     .from("negocios")
     .select("*")

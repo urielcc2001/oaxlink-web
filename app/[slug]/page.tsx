@@ -4,6 +4,7 @@ import { BotonesTarjeta } from "./botones-tarjeta";
 import "./card.css";
 
 export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 
 export default async function TarjetaNegocio({
   params
@@ -14,6 +15,8 @@ export default async function TarjetaNegocio({
   if (!negocio) notFound();
 
   await registrarEvento(negocio.slug, "scan");
+
+  console.log(negocio);
 
   return (
     <div className="page">
