@@ -87,7 +87,6 @@ const PLACA_VACIA: PlacaForm = {
   tipo: "individual"
 };
 
-type Mensaje = { tipo: "ok" | "error"; texto: string };
 type Seccion = "registrar" | "negocios" | "placa";
 
 export default function AdminPage() {
@@ -100,17 +99,29 @@ export default function AdminPage() {
 
   const [formNegocio, setFormNegocio] = useState<NegocioForm>(NEGOCIO_VACIO);
   const [guardandoNegocio, setGuardandoNegocio] = useState(false);
-  const [mensajeNegocio, setMensajeNegocio] = useState<Mensaje | null>(null);
+  const [errorNegocio, setErrorNegocio] = useState<string | null>(null);
   const [credencialesCreadas, setCredencialesCreadas] = useState<CredencialesCreadas | null>(null);
 
   const [formPlaca, setFormPlaca] = useState<PlacaForm>(PLACA_VACIA);
   const [guardandoPlaca, setGuardandoPlaca] = useState(false);
-  const [mensajePlaca, setMensajePlaca] = useState<Mensaje | null>(null);
+  const [errorPlaca, setErrorPlaca] = useState<string | null>(null);
 
   const [editandoSlug, setEditandoSlug] = useState<string | null>(null);
   const [formEdicion, setFormEdicion] = useState<NegocioEditForm>(EDICION_VACIA);
   const [guardandoEdicion, setGuardandoEdicion] = useState(false);
-  const [mensajeEdicion, setMensajeEdicion] = useState<Mensaje | null>(null);
+  const [errorEdicion, setErrorEdicion] = useState<string | null>(null);
+
+  const [toast, setToast] = useState<string | null>(null);
+
+  function mostrarToast(texto: string) {
+    setToast(texto);
+  }
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 3000);
+    return () => clearTimeout(timer);
+  }, [toast]);
 
   useEffect(() => {
     async function verificar() {
@@ -145,7 +156,7 @@ export default function AdminPage() {
   async function handleSubmitNegocio(e: FormEvent) {
     e.preventDefault();
     setGuardandoNegocio(true);
-    setMensajeNegocio(null);
+    setErrorNegocio(null);
     setCredencialesCreadas(null);
 
     const {
@@ -171,7 +182,7 @@ export default function AdminPage() {
     setGuardandoNegocio(false);
 
     if (!res.ok) {
-      setMensajeNegocio({ tipo: "error", texto: datos?.error ?? "No se pudo crear el negocio." });
+      setErrorNegocio(datos?.error ?? "No se pudo crear el negocio.");
       return;
     }
 
@@ -194,6 +205,7 @@ export default function AdminPage() {
     ]);
     setCredencialesCreadas({ slug: datos.slug, email: datos.email, password: datos.password });
     setFormNegocio(NEGOCIO_VACIO);
+    mostrarToast("Negocio creado correctamente.");
   }
 
   function handleChangePlaca(campo: keyof PlacaForm, valor: string) {
@@ -203,7 +215,7 @@ export default function AdminPage() {
   async function handleSubmitPlaca(e: FormEvent) {
     e.preventDefault();
     setGuardandoPlaca(true);
-    setMensajePlaca(null);
+    setErrorPlaca(null);
 
     const {
       data: { session }
@@ -228,14 +240,11 @@ export default function AdminPage() {
     setGuardandoPlaca(false);
 
     if (!res.ok) {
-      setMensajePlaca({ tipo: "error", texto: datos?.error ?? "No se pudo vincular la placa." });
+      setErrorPlaca(datos?.error ?? "No se pudo vincular la placa.");
       return;
     }
 
-    setMensajePlaca({
-      tipo: "ok",
-      texto: `Placa ${formPlaca.id_placa} vinculada a ${formPlaca.negocio_slug}.`
-    });
+    mostrarToast(`Placa ${formPlaca.id_placa} vinculada a ${formPlaca.negocio_slug}.`);
     setFormPlaca(PLACA_VACIA);
   }
 
@@ -246,7 +255,7 @@ export default function AdminPage() {
     }
 
     setEditandoSlug(n.slug);
-    setMensajeEdicion(null);
+    setErrorEdicion(null);
     setFormEdicion({
       nombre: n.nombre ?? "",
       bio: n.bio ?? "",
@@ -269,7 +278,7 @@ export default function AdminPage() {
     if (!editandoSlug) return;
 
     setGuardandoEdicion(true);
-    setMensajeEdicion(null);
+    setErrorEdicion(null);
 
     const {
       data: { session }
@@ -294,7 +303,7 @@ export default function AdminPage() {
     setGuardandoEdicion(false);
 
     if (!res.ok) {
-      setMensajeEdicion({ tipo: "error", texto: datos?.error ?? "No se pudo guardar." });
+      setErrorEdicion(datos?.error ?? "No se pudo guardar.");
       return;
     }
 
@@ -317,7 +326,7 @@ export default function AdminPage() {
           : n
       )
     );
-    setMensajeEdicion({ tipo: "ok", texto: "Cambios guardados." });
+    mostrarToast("Cambios guardados.");
   }
 
   async function handleEliminarNegocio(slug: string, nombre: string) {
@@ -513,11 +522,7 @@ export default function AdminPage() {
                   </label>
                 </div>
 
-                {mensajeNegocio && (
-                  <p className={`admin-mensaje ${mensajeNegocio.tipo === "error" ? "admin-mensaje-error" : ""}`}>
-                    {mensajeNegocio.texto}
-                  </p>
-                )}
+                {errorNegocio && <p className="admin-mensaje admin-mensaje-error">{errorNegocio}</p>}
 
                 <button type="submit" className="admin-btn-guardar" disabled={guardandoNegocio}>
                   {guardandoNegocio ? "Creando..." : "Crear negocio"}
@@ -590,73 +595,107 @@ export default function AdminPage() {
                             <tr className="admin-tabla-edicion-row">
                               <td colSpan={5}>
                                 <form className="admin-edicion-form" onSubmit={handleGuardarEdicion}>
-                                  <label>
-                                    Nombre
-                                    <input
-                                      value={formEdicion.nombre}
-                                      onChange={(e) => handleChangeEdicion("nombre", e.target.value)}
-                                      required
-                                    />
-                                  </label>
-                                  <label>
-                                    Email del dueño
-                                    <input
-                                      type="email"
-                                      value={formEdicion.email_dueno}
-                                      onChange={(e) => handleChangeEdicion("email_dueno", e.target.value)}
-                                    />
-                                  </label>
-                                  <label className="admin-form-full">
-                                    Bio
-                                    <input
-                                      value={formEdicion.bio}
-                                      onChange={(e) => handleChangeEdicion("bio", e.target.value)}
-                                    />
-                                  </label>
-                                  <label>
-                                    Logo (URL)
-                                    <input
-                                      value={formEdicion.logo_url}
-                                      onChange={(e) => handleChangeEdicion("logo_url", e.target.value)}
-                                    />
-                                  </label>
-                                  <label>
-                                    WhatsApp
-                                    <input
-                                      value={formEdicion.whatsapp}
-                                      onChange={(e) => handleChangeEdicion("whatsapp", e.target.value)}
-                                    />
-                                  </label>
-                                  <label>
-                                    Reseña de Google
-                                    <input
-                                      value={formEdicion.google_review_url}
-                                      onChange={(e) =>
-                                        handleChangeEdicion("google_review_url", e.target.value)
-                                      }
-                                    />
-                                  </label>
-                                  <label>
-                                    Facebook
-                                    <input
-                                      value={formEdicion.facebook}
-                                      onChange={(e) => handleChangeEdicion("facebook", e.target.value)}
-                                    />
-                                  </label>
-                                  <label>
-                                    Instagram
-                                    <input
-                                      value={formEdicion.instagram}
-                                      onChange={(e) => handleChangeEdicion("instagram", e.target.value)}
-                                    />
-                                  </label>
-                                  <label>
-                                    TikTok
-                                    <input
-                                      value={formEdicion.tiktok}
-                                      onChange={(e) => handleChangeEdicion("tiktok", e.target.value)}
-                                    />
-                                  </label>
+                                  <div>
+                                    <h4 className="admin-edicion-bloque-title">Información básica</h4>
+                                    <div className="admin-edicion-grid">
+                                      <label>
+                                        Nombre
+                                        <input
+                                          value={formEdicion.nombre}
+                                          onChange={(e) => handleChangeEdicion("nombre", e.target.value)}
+                                          required
+                                        />
+                                      </label>
+                                      <label>
+                                        Email del dueño
+                                        <input
+                                          type="email"
+                                          value={formEdicion.email_dueno}
+                                          onChange={(e) =>
+                                            handleChangeEdicion("email_dueno", e.target.value)
+                                          }
+                                        />
+                                      </label>
+                                      <label className="admin-form-full">
+                                        Bio
+                                        <input
+                                          value={formEdicion.bio}
+                                          onChange={(e) => handleChangeEdicion("bio", e.target.value)}
+                                        />
+                                      </label>
+                                      <label>
+                                        Logo (URL)
+                                        <input
+                                          value={formEdicion.logo_url}
+                                          onChange={(e) => handleChangeEdicion("logo_url", e.target.value)}
+                                        />
+                                      </label>
+                                    </div>
+                                  </div>
+
+                                  <div>
+                                    <h4 className="admin-edicion-bloque-title">Redes y contacto</h4>
+                                    <div className="admin-edicion-grid">
+                                      <label>
+                                        WhatsApp
+                                        <div className="admin-input-icon">
+                                          <IconoWhatsApp />
+                                          <input
+                                            value={formEdicion.whatsapp}
+                                            onChange={(e) =>
+                                              handleChangeEdicion("whatsapp", e.target.value)
+                                            }
+                                          />
+                                        </div>
+                                      </label>
+                                      <label>
+                                        Reseña de Google
+                                        <div className="admin-input-icon">
+                                          <IconoGoogle />
+                                          <input
+                                            value={formEdicion.google_review_url}
+                                            onChange={(e) =>
+                                              handleChangeEdicion("google_review_url", e.target.value)
+                                            }
+                                          />
+                                        </div>
+                                      </label>
+                                      <label>
+                                        Facebook
+                                        <div className="admin-input-icon">
+                                          <IconoFacebook />
+                                          <input
+                                            value={formEdicion.facebook}
+                                            onChange={(e) =>
+                                              handleChangeEdicion("facebook", e.target.value)
+                                            }
+                                          />
+                                        </div>
+                                      </label>
+                                      <label>
+                                        Instagram
+                                        <div className="admin-input-icon">
+                                          <IconoInstagram />
+                                          <input
+                                            value={formEdicion.instagram}
+                                            onChange={(e) =>
+                                              handleChangeEdicion("instagram", e.target.value)
+                                            }
+                                          />
+                                        </div>
+                                      </label>
+                                      <label>
+                                        TikTok
+                                        <div className="admin-input-icon">
+                                          <IconoTikTok />
+                                          <input
+                                            value={formEdicion.tiktok}
+                                            onChange={(e) => handleChangeEdicion("tiktok", e.target.value)}
+                                          />
+                                        </div>
+                                      </label>
+                                    </div>
+                                  </div>
 
                                   <div className="admin-edicion-acciones">
                                     <button
@@ -666,14 +705,8 @@ export default function AdminPage() {
                                     >
                                       {guardandoEdicion ? "Guardando..." : "Guardar"}
                                     </button>
-                                    {mensajeEdicion && (
-                                      <p
-                                        className={`admin-mensaje ${
-                                          mensajeEdicion.tipo === "error" ? "admin-mensaje-error" : ""
-                                        }`}
-                                      >
-                                        {mensajeEdicion.texto}
-                                      </p>
+                                    {errorEdicion && (
+                                      <p className="admin-mensaje admin-mensaje-error">{errorEdicion}</p>
                                     )}
                                   </div>
                                 </form>
@@ -737,11 +770,7 @@ export default function AdminPage() {
                     </select>
                   </label>
 
-                  {mensajePlaca && (
-                    <p className={`admin-mensaje ${mensajePlaca.tipo === "error" ? "admin-mensaje-error" : ""}`}>
-                      {mensajePlaca.texto}
-                    </p>
-                  )}
+                  {errorPlaca && <p className="admin-mensaje admin-mensaje-error">{errorPlaca}</p>}
 
                   <button type="submit" className="admin-btn-guardar" disabled={guardandoPlaca}>
                     {guardandoPlaca ? "Vinculando..." : "Vincular placa"}
@@ -752,6 +781,13 @@ export default function AdminPage() {
           )}
         </div>
       </main>
+
+      {toast && (
+        <div className="admin-toast">
+          <span className="admin-toast-icon">✓</span>
+          <span>{toast}</span>
+        </div>
+      )}
     </div>
   );
 }
