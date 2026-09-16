@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { esEmailAdmin } from "@/lib/admin-emails";
 import "./login.css";
 
 export default function LoginPage() {
@@ -26,8 +27,7 @@ export default function LoginPage() {
       return;
     }
 
-    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-    if (adminEmail && data.user?.email === adminEmail) {
+    if (esEmailAdmin(data.user?.email, process.env.NEXT_PUBLIC_ADMIN_EMAIL)) {
       router.push("/admin");
       return;
     }

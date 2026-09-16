@@ -6,6 +6,7 @@ import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { IconoFacebook, IconoGoogle, IconoInstagram, IconoTikTok, IconoWhatsApp } from "@/components/iconos";
 import { OPCIONES_ETIQUETA_PDF } from "@/lib/negocios";
+import { esEmailAdmin } from "@/lib/admin-emails";
 import "./admin.css";
 
 type NegocioForm = {
@@ -155,9 +156,7 @@ export default function AdminPage() {
       if (cargado) return;
       cargado = true;
 
-      const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-
-      if (!adminEmail || session.user.email !== adminEmail) {
+      if (!esEmailAdmin(session.user.email, process.env.NEXT_PUBLIC_ADMIN_EMAIL)) {
         router.replace("/login");
         return;
       }

@@ -1,7 +1,8 @@
 // Verificación compartida por las rutas /api/admin/*: confirma que el
-// access_token pertenece al usuario cuyo email coincide con ADMIN_EMAIL.
+// access_token pertenece a un usuario cuyo email está en ADMIN_EMAIL.
 
 import { supabase } from "./supabase";
+import { esEmailAdmin } from "./admin-emails";
 
 type ResultadoVerificacion = { ok: true } | { ok: false; status: number; error: string };
 
@@ -18,7 +19,7 @@ export async function verificarAdmin(request: Request): Promise<ResultadoVerific
     return { ok: false, status: 401, error: "No autorizado" };
   }
 
-  if (data.user.email !== process.env.ADMIN_EMAIL) {
+  if (!esEmailAdmin(data.user.email, process.env.ADMIN_EMAIL)) {
     return { ok: false, status: 403, error: "Prohibido" };
   }
 
