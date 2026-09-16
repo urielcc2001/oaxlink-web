@@ -17,6 +17,7 @@ type NegocioForm = {
   tiktok: string;
   logo_url: string;
   email_dueno: string;
+  password: string;
 };
 
 const NEGOCIO_VACIO: NegocioForm = {
@@ -29,8 +30,11 @@ const NEGOCIO_VACIO: NegocioForm = {
   instagram: "",
   tiktok: "",
   logo_url: "",
-  email_dueno: ""
+  email_dueno: "",
+  password: ""
 };
+
+type CredencialesCreadas = { slug: string; email: string; password: string };
 
 type NegocioAdmin = {
   slug: string;
@@ -97,6 +101,7 @@ export default function AdminPage() {
   const [formNegocio, setFormNegocio] = useState<NegocioForm>(NEGOCIO_VACIO);
   const [guardandoNegocio, setGuardandoNegocio] = useState(false);
   const [mensajeNegocio, setMensajeNegocio] = useState<Mensaje | null>(null);
+  const [credencialesCreadas, setCredencialesCreadas] = useState<CredencialesCreadas | null>(null);
 
   const [formPlaca, setFormPlaca] = useState<PlacaForm>(PLACA_VACIA);
   const [guardandoPlaca, setGuardandoPlaca] = useState(false);
@@ -141,6 +146,7 @@ export default function AdminPage() {
     e.preventDefault();
     setGuardandoNegocio(true);
     setMensajeNegocio(null);
+    setCredencialesCreadas(null);
 
     const {
       data: { session }
@@ -186,7 +192,7 @@ export default function AdminPage() {
         estado: "activo"
       }
     ]);
-    setMensajeNegocio({ tipo: "ok", texto: `Negocio creado: oaxlink.com/${formNegocio.slug}` });
+    setCredencialesCreadas({ slug: datos.slug, email: datos.email, password: datos.password });
     setFormNegocio(NEGOCIO_VACIO);
   }
 
@@ -444,6 +450,13 @@ export default function AdminPage() {
                       onChange={(e) => handleChangeNegocio("email_dueno", e.target.value)}
                     />
                   </label>
+                  <label>
+                    Contraseña temporal
+                    <input
+                      value={formNegocio.password}
+                      onChange={(e) => handleChangeNegocio("password", e.target.value)}
+                    />
+                  </label>
                 </div>
 
                 <div className="admin-form-card">
@@ -510,6 +523,26 @@ export default function AdminPage() {
                   {guardandoNegocio ? "Creando..." : "Crear negocio"}
                 </button>
               </form>
+
+              {credencialesCreadas && (
+                <div className="admin-card admin-credenciales">
+                  <h2 className="admin-card-title">Negocio creado</h2>
+                  <p className="admin-mensaje">
+                    Link: oaxlink.com/{credencialesCreadas.slug}
+                  </p>
+                  <p className="admin-credenciales-aviso">
+                    Copia estas credenciales y pásaselas al dueño — no se volverán a mostrar.
+                  </p>
+                  <div className="admin-credenciales-datos">
+                    <span>
+                      <strong>Email:</strong> {credencialesCreadas.email}
+                    </span>
+                    <span>
+                      <strong>Contraseña:</strong> {credencialesCreadas.password}
+                    </span>
+                  </div>
+                </div>
+              )}
             </>
           )}
 
