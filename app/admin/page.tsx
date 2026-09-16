@@ -578,6 +578,14 @@ export default function AdminPage() {
                             <td>{n.estado ?? "—"}</td>
                             <td>
                               <div className="admin-tabla-acciones">
+                                <a
+                                  className="admin-btn-ver"
+                                  href={`https://oaxlink.com/${n.slug}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  Ver
+                                </a>
                                 <button className="admin-btn-editar" onClick={() => toggleEditar(n)}>
                                   {editandoSlug === n.slug ? "Cerrar" : "Editar"}
                                 </button>

@@ -369,6 +369,26 @@
   gap: 8px;
 }
 
+.admin-btn-ver {
+  display: inline-flex;
+  align-items: center;
+  background: transparent;
+  border: 1px solid rgba(46, 139, 119, 0.4);
+  color: var(--teal);
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.admin-btn-ver:hover {
+  background: rgba(46, 139, 119, 0.1);
+  border-color: var(--teal);
+}
+
 .admin-btn-editar {
   background: transparent;
   border: 1px solid var(--line-hover);
