@@ -17,12 +17,18 @@ export default function LoginPage() {
     setError(null);
     setCargando(true);
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     setCargando(false);
 
     if (error) {
       setError("Correo o contraseña incorrectos.");
+      return;
+    }
+
+    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+    if (adminEmail && data.user?.email === adminEmail) {
+      router.push("/admin");
       return;
     }
 
