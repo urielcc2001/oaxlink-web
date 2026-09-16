@@ -44,3 +44,9 @@ alter table negocios add column if not exists tiktok text;
 -- Corre esto si tu tabla `negocios` ya existía antes de agregar la etiqueta
 -- personalizable del botón de PDF (por defecto se muestra "Menú").
 alter table negocios add column if not exists menu_pdf_label text;
+
+-- Corre esto si tu tabla `negocios` ya existía antes de agregar los datos
+-- de pago opcionales (solo se muestran en la tarjeta si los tres están llenos).
+alter table negocios add column if not exists banco text;
+alter table negocios add column if not exists titular_cuenta text;
+alter table negocios add column if not exists clabe text;

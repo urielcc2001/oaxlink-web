@@ -16,6 +16,9 @@ export type Negocio = {
   instagram?: string;
   menuPdfUrl?: string;
   menuPdfLabel: string;
+  banco?: string;
+  titularCuenta?: string;
+  clabe?: string;
 };
 
 type NegocioRow = {
@@ -29,6 +32,9 @@ type NegocioRow = {
   instagram: string | null;
   menu_pdf_url: string | null;
   menu_pdf_label: string | null;
+  banco: string | null;
+  titular_cuenta: string | null;
+  clabe: string | null;
 };
 
 function mapRow(row: NegocioRow): Negocio {
@@ -42,7 +48,10 @@ function mapRow(row: NegocioRow): Negocio {
     facebook: row.facebook ?? undefined,
     instagram: row.instagram ?? undefined,
     menuPdfUrl: row.menu_pdf_url ?? undefined,
-    menuPdfLabel: row.menu_pdf_label ?? "Menú"
+    menuPdfLabel: row.menu_pdf_label ?? "Menú",
+    banco: row.banco ?? undefined,
+    titularCuenta: row.titular_cuenta ?? undefined,
+    clabe: row.clabe ?? undefined
   };
 }
 

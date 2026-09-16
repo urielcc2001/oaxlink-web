@@ -287,6 +287,12 @@
   color: #e07a7a;
 }
 
+.admin-form-nota {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: -0.4rem;
+}
+
 .admin-credenciales {
   border-color: var(--gold);
 }

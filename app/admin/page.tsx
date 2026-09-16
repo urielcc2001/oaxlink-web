@@ -20,6 +20,9 @@ type NegocioForm = {
   logo_url: string;
   email_dueno: string;
   password: string;
+  banco: string;
+  titular_cuenta: string;
+  clabe: string;
 };
 
 const NEGOCIO_VACIO: NegocioForm = {
@@ -33,7 +36,10 @@ const NEGOCIO_VACIO: NegocioForm = {
   tiktok: "",
   logo_url: "",
   email_dueno: "",
-  password: ""
+  password: "",
+  banco: "",
+  titular_cuenta: "",
+  clabe: ""
 };
 
 type CredencialesCreadas = { slug: string; email: string; password: string };
@@ -51,6 +57,9 @@ type NegocioAdmin = {
   email_dueno: string | null;
   menu_pdf_url: string | null;
   menu_pdf_label: string | null;
+  banco: string | null;
+  titular_cuenta: string | null;
+  clabe: string | null;
   plan: string | null;
   estado: string | null;
 };
@@ -67,6 +76,9 @@ type NegocioEditForm = {
   email_dueno: string;
   menu_pdf_url: string;
   menu_pdf_label: string;
+  banco: string;
+  titular_cuenta: string;
+  clabe: string;
 };
 
 const EDICION_VACIA: NegocioEditForm = {
@@ -80,7 +92,10 @@ const EDICION_VACIA: NegocioEditForm = {
   logo_url: "",
   email_dueno: "",
   menu_pdf_url: "",
-  menu_pdf_label: "Menú"
+  menu_pdf_label: "Menú",
+  banco: "",
+  titular_cuenta: "",
+  clabe: ""
 };
 
 type PlacaForm = {
@@ -226,6 +241,9 @@ export default function AdminPage() {
         email_dueno: formNegocio.email_dueno || null,
         menu_pdf_url: null,
         menu_pdf_label: null,
+        banco: formNegocio.banco || null,
+        titular_cuenta: formNegocio.titular_cuenta || null,
+        clabe: formNegocio.clabe || null,
         plan: "basico",
         estado: "activo"
       }
@@ -295,7 +313,10 @@ export default function AdminPage() {
       logo_url: n.logo_url ?? "",
       email_dueno: n.email_dueno ?? "",
       menu_pdf_url: n.menu_pdf_url ?? "",
-      menu_pdf_label: n.menu_pdf_label ?? "Menú"
+      menu_pdf_label: n.menu_pdf_label ?? "Menú",
+      banco: n.banco ?? "",
+      titular_cuenta: n.titular_cuenta ?? "",
+      clabe: n.clabe ?? ""
     });
   }
 
@@ -392,7 +413,10 @@ export default function AdminPage() {
               logo_url: formEdicion.logo_url || null,
               email_dueno: formEdicion.email_dueno || null,
               menu_pdf_url: formEdicion.menu_pdf_url || null,
-              menu_pdf_label: formEdicion.menu_pdf_label || null
+              menu_pdf_label: formEdicion.menu_pdf_label || null,
+              banco: formEdicion.banco || null,
+              titular_cuenta: formEdicion.titular_cuenta || null,
+              clabe: formEdicion.clabe || null
             }
           : n
       )
@@ -591,6 +615,34 @@ export default function AdminPage() {
                       />
                     </div>
                   </label>
+                </div>
+
+                <div className="admin-form-card">
+                  <h3 className="admin-form-card-title">Datos de pago (opcional)</h3>
+                  <label>
+                    Banco
+                    <input
+                      value={formNegocio.banco}
+                      onChange={(e) => handleChangeNegocio("banco", e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Titular de la cuenta
+                    <input
+                      value={formNegocio.titular_cuenta}
+                      onChange={(e) => handleChangeNegocio("titular_cuenta", e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    CLABE
+                    <input
+                      value={formNegocio.clabe}
+                      onChange={(e) => handleChangeNegocio("clabe", e.target.value)}
+                    />
+                  </label>
+                  <p className="admin-form-nota">
+                    Se muestra a tus clientes solo si llenas los tres campos.
+                  </p>
                 </div>
 
                 {errorNegocio && <p className="admin-mensaje admin-mensaje-error">{errorNegocio}</p>}
@@ -826,6 +878,38 @@ export default function AdminPage() {
                                         </div>
                                       </label>
                                     </div>
+                                  </div>
+
+                                  <div>
+                                    <h4 className="admin-edicion-bloque-title">Datos de pago (opcional)</h4>
+                                    <div className="admin-edicion-grid">
+                                      <label>
+                                        Banco
+                                        <input
+                                          value={formEdicion.banco}
+                                          onChange={(e) => handleChangeEdicion("banco", e.target.value)}
+                                        />
+                                      </label>
+                                      <label>
+                                        Titular de la cuenta
+                                        <input
+                                          value={formEdicion.titular_cuenta}
+                                          onChange={(e) =>
+                                            handleChangeEdicion("titular_cuenta", e.target.value)
+                                          }
+                                        />
+                                      </label>
+                                      <label>
+                                        CLABE
+                                        <input
+                                          value={formEdicion.clabe}
+                                          onChange={(e) => handleChangeEdicion("clabe", e.target.value)}
+                                        />
+                                      </label>
+                                    </div>
+                                    <p className="admin-form-nota">
+                                      Se muestra a tus clientes solo si llenas los tres campos.
+                                    </p>
                                   </div>
 
                                   <div className="admin-edicion-acciones">

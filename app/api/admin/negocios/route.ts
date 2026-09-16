@@ -60,7 +60,10 @@ export async function POST(request: Request) {
     instagram: body?.instagram || null,
     tiktok: body?.tiktok || null,
     logo_url: body?.logo_url || null,
-    email_dueno: emailDueno
+    email_dueno: emailDueno,
+    banco: body?.banco || null,
+    titular_cuenta: body?.titular_cuenta || null,
+    clabe: body?.clabe || null
   });
 
   if (error) {

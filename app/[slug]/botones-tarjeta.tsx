@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { Negocio } from "@/lib/negocios";
 
 type TipoEvento = "click_google" | "click_wa" | "click_menu" | "click_social";
@@ -14,6 +15,19 @@ function registrarClick(slug: string, tipo: TipoEvento) {
 }
 
 export function BotonesTarjeta({ negocio }: { negocio: Negocio }) {
+  const [mostrarPago, setMostrarPago] = useState(false);
+  const [copiado, setCopiado] = useState(false);
+
+  async function handleCopiarClabe() {
+    try {
+      await navigator.clipboard.writeText(negocio.clabe ?? "");
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 2000);
+    } catch {
+      // portapapeles no disponible; no hacemos nada más.
+    }
+  }
+
   return (
     <>
       <a
@@ -70,6 +84,36 @@ export function BotonesTarjeta({ negocio }: { negocio: Negocio }) {
       >
         💬 Escríbenos por WhatsApp
       </a>
+
+      {negocio.banco && negocio.titularCuenta && negocio.clabe && (
+        <div className="pago-wrap">
+          <button
+            type="button"
+            className="btn btn-pago"
+            onClick={() => setMostrarPago((prev) => !prev)}
+          >
+            💳 Datos de pago
+          </button>
+          <div className={`pago-panel ${mostrarPago ? "pago-panel-abierto" : ""}`}>
+            <div className="pago-panel-inner">
+              <p>
+                <strong>Banco:</strong> {negocio.banco}
+              </p>
+              <p>
+                <strong>Titular:</strong> {negocio.titularCuenta}
+              </p>
+              <p className="pago-clabe">
+                <span>
+                  <strong>CLABE:</strong> {negocio.clabe}
+                </span>
+                <button type="button" className="btn-copiar" onClick={handleCopiarClabe}>
+                  {copiado ? "¡Copiado!" : "Copiar"}
+                </button>
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

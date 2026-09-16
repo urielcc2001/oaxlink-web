@@ -64,6 +64,56 @@
   background: #e1306c;
   color: #ffffff;
 }
+.btn-pago {
+  background: #0f172a;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+.pago-wrap {
+  text-align: left;
+}
+.pago-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+  margin-bottom: 12px;
+}
+.pago-panel-abierto {
+  max-height: 240px;
+}
+.pago-panel-inner {
+  background: #f1f5f9;
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+.pago-panel-inner p {
+  margin: 0 0 8px;
+  color: #334155;
+  font-size: 0.88rem;
+}
+.pago-panel-inner p:last-child {
+  margin-bottom: 0;
+}
+.pago-clabe {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.btn-copiar {
+  background: #0f172a;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  font-family: inherit;
+}
 .footer {
   margin-top: 24px;
   font-size: 0.75rem;

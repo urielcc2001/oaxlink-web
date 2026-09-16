@@ -21,6 +21,9 @@ type NegocioRow = {
   google_review_url: string | null;
   menu_pdf_url: string | null;
   menu_pdf_label: string | null;
+  banco: string | null;
+  titular_cuenta: string | null;
+  clabe: string | null;
 };
 
 type FormNegocio = {
@@ -33,6 +36,9 @@ type FormNegocio = {
   google_review_url: string;
   menu_pdf_url: string;
   menu_pdf_label: string;
+  banco: string;
+  titular_cuenta: string;
+  clabe: string;
 };
 
 type Metricas = {
@@ -53,7 +59,10 @@ const FORM_VACIO: FormNegocio = {
   tiktok: "",
   google_review_url: "",
   menu_pdf_url: "",
-  menu_pdf_label: "Menú"
+  menu_pdf_label: "Menú",
+  banco: "",
+  titular_cuenta: "",
+  clabe: ""
 };
 
 export default function MiNegocioPage() {
@@ -98,7 +107,10 @@ export default function MiNegocioPage() {
         tiktok: row.tiktok ?? "",
         google_review_url: row.google_review_url ?? "",
         menu_pdf_url: row.menu_pdf_url ?? "",
-        menu_pdf_label: row.menu_pdf_label ?? "Menú"
+        menu_pdf_label: row.menu_pdf_label ?? "Menú",
+        banco: row.banco ?? "",
+        titular_cuenta: row.titular_cuenta ?? "",
+        clabe: row.clabe ?? ""
       });
       setCargando(false);
 
@@ -387,6 +399,26 @@ export default function MiNegocioPage() {
                       />
                     </div>
                   </label>
+                </div>
+
+                <div className="mn-form-card">
+                  <h3 className="mn-form-card-title">Datos de pago (opcional)</h3>
+                  <label>
+                    Banco
+                    <input value={form.banco} onChange={(e) => handleChange("banco", e.target.value)} />
+                  </label>
+                  <label>
+                    Titular de la cuenta
+                    <input
+                      value={form.titular_cuenta}
+                      onChange={(e) => handleChange("titular_cuenta", e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    CLABE
+                    <input value={form.clabe} onChange={(e) => handleChange("clabe", e.target.value)} />
+                  </label>
+                  <p className="mn-form-nota">Se muestra a tus clientes solo si llenas los tres campos.</p>
                 </div>
 
                 {mensaje && <p className="mn-mensaje">{mensaje}</p>}

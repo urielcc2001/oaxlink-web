@@ -26,7 +26,10 @@ export async function PATCH(request: Request, { params }: { params: { slug: stri
       logo_url: body.logo_url || null,
       email_dueno: body.email_dueno || null,
       menu_pdf_url: body.menu_pdf_url || null,
-      menu_pdf_label: body.menu_pdf_label || null
+      menu_pdf_label: body.menu_pdf_label || null,
+      banco: body.banco || null,
+      titular_cuenta: body.titular_cuenta || null,
+      clabe: body.clabe || null
     })
     .eq("slug", params.slug);
 
