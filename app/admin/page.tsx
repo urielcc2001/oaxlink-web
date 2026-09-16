@@ -2,6 +2,7 @@
 
 import { FormEvent, Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { IconoFacebook, IconoGoogle, IconoInstagram, IconoTikTok, IconoWhatsApp } from "@/components/iconos";
 import "./admin.css";
@@ -124,14 +125,15 @@ export default function AdminPage() {
   }, [toast]);
 
   useEffect(() => {
-    async function verificar() {
-      const {
-        data: { session }
-      } = await supabase.auth.getSession();
+    let cargado = false;
+
+    async function verificar(session: Session) {
+      if (cargado) return;
+      cargado = true;
 
       const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 
-      if (!session || !adminEmail || session.user.email !== adminEmail) {
+      if (!adminEmail || session.user.email !== adminEmail) {
         router.replace("/login");
         return;
       }
@@ -146,7 +148,21 @@ export default function AdminPage() {
       if (res.ok && datos?.negocios) setNegocios(datos.negocios as NegocioAdmin[]);
     }
 
-    verificar();
+    // Igual que en /mi-negocio: esperamos a onAuthStateChange en vez de una
+    // sola llamada a getSession(), que puede resolver vacía si el navegador
+    // todavía no terminó de leer la sesión persistida (condición de carrera).
+    const {
+      data: { subscription }
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session) {
+        router.replace("/login");
+        return;
+      }
+
+      verificar(session);
+    });
+
+    return () => subscription.unsubscribe();
   }, [router]);
 
   function handleChangeNegocio(campo: keyof NegocioForm, valor: string) {

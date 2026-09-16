@@ -2,6 +2,7 @@
 
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import type { PuntoSerie } from "@/lib/eventos";
 import { GraficaSerie } from "./grafica-serie";
@@ -64,15 +65,11 @@ export default function MiNegocioPage() {
   const [errorPdf, setErrorPdf] = useState<string | null>(null);
 
   useEffect(() => {
-    async function cargar() {
-      const {
-        data: { session }
-      } = await supabase.auth.getSession();
+    let cargado = false;
 
-      if (!session) {
-        router.replace("/login");
-        return;
-      }
+    async function cargar(session: Session) {
+      if (cargado) return;
+      cargado = true;
 
       const { data, error } = await supabase
         .from("negocios")
@@ -107,7 +104,23 @@ export default function MiNegocioPage() {
         .then((datos) => datos && setMetricas(datos));
     }
 
-    cargar();
+    // No decidimos "no hay sesión" con una sola lectura de getSession(): si el
+    // navegador todavía no terminó de leer la sesión persistida en localStorage,
+    // esa lectura puede llegar vacía aunque sí haya sesión (condición de carrera).
+    // onAuthStateChange espera esa resolución inicial (evento INITIAL_SESSION)
+    // antes de avisar, y además sigue escuchando cambios reales (logout, etc.).
+    const {
+      data: { subscription }
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session) {
+        router.replace("/login");
+        return;
+      }
+
+      cargar(session);
+    });
+
+    return () => subscription.unsubscribe();
   }, [router]);
 
   function handleChange(campo: keyof FormNegocio, valor: string) {
