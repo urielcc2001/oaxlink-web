@@ -8,10 +8,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: verificacion.error }, { status: verificacion.status });
   }
 
-  const { data, error } = await supabaseAdmin
-    .from("negocios")
-    .select("slug, nombre, plan, estado")
-    .order("nombre");
+  const { data, error } = await supabaseAdmin.from("negocios").select("*").order("nombre");
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

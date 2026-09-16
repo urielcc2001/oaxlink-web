@@ -29,13 +29,13 @@ export function IconoInstagram() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
       <defs>
-        <linearGradient id="mn-ig-grad" x1="0" y1="24" x2="24" y2="0">
+        <linearGradient id="ig-grad" x1="0" y1="24" x2="24" y2="0">
           <stop offset="0" stopColor="#f9ce34" />
           <stop offset="0.5" stopColor="#ee2a7b" />
           <stop offset="1" stopColor="#6228d7" />
         </linearGradient>
       </defs>
-      <rect width="24" height="24" rx="6" fill="url(#mn-ig-grad)" />
+      <rect width="24" height="24" rx="6" fill="url(#ig-grad)" />
       <rect x="6" y="6" width="12" height="12" rx="3" fill="none" stroke="#fff" strokeWidth="1.6" />
       <circle cx="12" cy="12" r="3" fill="none" stroke="#fff" strokeWidth="1.6" />
       <circle cx="15.4" cy="8.6" r="0.9" fill="#fff" />
@@ -64,7 +64,7 @@ export function IconoGoogle() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
       <defs>
-        <linearGradient id="mn-google-grad" x1="0" y1="0" x2="24" y2="24">
+        <linearGradient id="google-grad" x1="0" y1="0" x2="24" y2="24">
           <stop offset="0" stopColor="#4285F4" />
           <stop offset="0.35" stopColor="#EA4335" />
           <stop offset="0.65" stopColor="#FBBC05" />
@@ -73,7 +73,7 @@ export function IconoGoogle() {
       </defs>
       <path
         d="M12 2.5l2.6 5.6 6.1.6-4.6 4.1 1.3 6-5.4-3.1-5.4 3.1 1.3-6-4.6-4.1 6.1-.6z"
-        fill="url(#mn-google-grad)"
+        fill="url(#google-grad)"
       />
     </svg>
   );

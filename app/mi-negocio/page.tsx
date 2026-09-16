@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import type { PuntoSerie } from "@/lib/eventos";
 import { GraficaSerie } from "./grafica-serie";
-import { IconoFacebook, IconoGoogle, IconoInstagram, IconoTikTok, IconoWhatsApp } from "./iconos";
+import { IconoFacebook, IconoGoogle, IconoInstagram, IconoTikTok, IconoWhatsApp } from "@/components/iconos";
 import "./mi-negocio.css";
 
 type NegocioRow = {
