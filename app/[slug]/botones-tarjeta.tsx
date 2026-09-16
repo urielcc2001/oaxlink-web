@@ -57,7 +57,7 @@ export function BotonesTarjeta({ negocio }: { negocio: Negocio }) {
           className="btn btn-google"
           onClick={() => registrarClick(negocio.slug, "click_menu")}
         >
-          📎 Ver menú
+          📎 Ver {negocio.menuPdfLabel}
         </a>
       )}
 

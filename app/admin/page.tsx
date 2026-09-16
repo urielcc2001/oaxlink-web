@@ -1,10 +1,11 @@
 "use client";
 
-import { FormEvent, Fragment, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { IconoFacebook, IconoGoogle, IconoInstagram, IconoTikTok, IconoWhatsApp } from "@/components/iconos";
+import { OPCIONES_ETIQUETA_PDF } from "@/lib/negocios";
 import "./admin.css";
 
 type NegocioForm = {
@@ -48,6 +49,8 @@ type NegocioAdmin = {
   tiktok: string | null;
   logo_url: string | null;
   email_dueno: string | null;
+  menu_pdf_url: string | null;
+  menu_pdf_label: string | null;
   plan: string | null;
   estado: string | null;
 };
@@ -62,6 +65,8 @@ type NegocioEditForm = {
   tiktok: string;
   logo_url: string;
   email_dueno: string;
+  menu_pdf_url: string;
+  menu_pdf_label: string;
 };
 
 const EDICION_VACIA: NegocioEditForm = {
@@ -73,7 +78,9 @@ const EDICION_VACIA: NegocioEditForm = {
   instagram: "",
   tiktok: "",
   logo_url: "",
-  email_dueno: ""
+  email_dueno: "",
+  menu_pdf_url: "",
+  menu_pdf_label: "Menú"
 };
 
 type PlacaForm = {
@@ -111,6 +118,8 @@ export default function AdminPage() {
   const [formEdicion, setFormEdicion] = useState<NegocioEditForm>(EDICION_VACIA);
   const [guardandoEdicion, setGuardandoEdicion] = useState(false);
   const [errorEdicion, setErrorEdicion] = useState<string | null>(null);
+  const [subiendoPdfEdicion, setSubiendoPdfEdicion] = useState(false);
+  const [errorPdfEdicion, setErrorPdfEdicion] = useState<string | null>(null);
 
   const [toast, setToast] = useState<string | null>(null);
 
@@ -215,6 +224,8 @@ export default function AdminPage() {
         tiktok: formNegocio.tiktok || null,
         logo_url: formNegocio.logo_url || null,
         email_dueno: formNegocio.email_dueno || null,
+        menu_pdf_url: null,
+        menu_pdf_label: null,
         plan: "basico",
         estado: "activo"
       }
@@ -272,6 +283,7 @@ export default function AdminPage() {
 
     setEditandoSlug(n.slug);
     setErrorEdicion(null);
+    setErrorPdfEdicion(null);
     setFormEdicion({
       nombre: n.nombre ?? "",
       bio: n.bio ?? "",
@@ -281,12 +293,53 @@ export default function AdminPage() {
       instagram: n.instagram ?? "",
       tiktok: n.tiktok ?? "",
       logo_url: n.logo_url ?? "",
-      email_dueno: n.email_dueno ?? ""
+      email_dueno: n.email_dueno ?? "",
+      menu_pdf_url: n.menu_pdf_url ?? "",
+      menu_pdf_label: n.menu_pdf_label ?? "Menú"
     });
   }
 
   function handleChangeEdicion(campo: keyof NegocioEditForm, valor: string) {
     setFormEdicion((prev) => ({ ...prev, [campo]: valor }));
+  }
+
+  function handleChangeEtiquetaPdfEdicion(valor: string) {
+    if (valor === "personalizado") {
+      setFormEdicion((prev) => ({
+        ...prev,
+        menu_pdf_label: OPCIONES_ETIQUETA_PDF.includes(prev.menu_pdf_label) ? "" : prev.menu_pdf_label
+      }));
+      return;
+    }
+
+    handleChangeEdicion("menu_pdf_label", valor);
+  }
+
+  async function handlePdfChangeEdicion(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !editandoSlug) return;
+
+    setErrorPdfEdicion(null);
+    setSubiendoPdfEdicion(true);
+
+    const path = `${editandoSlug}/${Date.now()}-${file.name}`;
+    const { error: uploadError } = await supabase.storage.from("menus").upload(path, file, {
+      upsert: true
+    });
+
+    if (uploadError) {
+      setSubiendoPdfEdicion(false);
+      setErrorPdfEdicion("No se pudo subir el PDF. Intenta de nuevo.");
+      return;
+    }
+
+    const {
+      data: { publicUrl }
+    } = supabase.storage.from("menus").getPublicUrl(path);
+
+    setFormEdicion((prev) => ({ ...prev, menu_pdf_url: publicUrl }));
+    setSubiendoPdfEdicion(false);
   }
 
   async function handleGuardarEdicion(e: FormEvent) {
@@ -337,7 +390,9 @@ export default function AdminPage() {
               instagram: formEdicion.instagram || null,
               tiktok: formEdicion.tiktok || null,
               logo_url: formEdicion.logo_url || null,
-              email_dueno: formEdicion.email_dueno || null
+              email_dueno: formEdicion.email_dueno || null,
+              menu_pdf_url: formEdicion.menu_pdf_url || null,
+              menu_pdf_label: formEdicion.menu_pdf_label || null
             }
           : n
       )
@@ -654,6 +709,58 @@ export default function AdminPage() {
                                           onChange={(e) => handleChangeEdicion("logo_url", e.target.value)}
                                         />
                                       </label>
+                                      <label className="admin-form-full">
+                                        Menú / avisos (PDF)
+                                        {formEdicion.menu_pdf_url && (
+                                          <a
+                                            href={formEdicion.menu_pdf_url}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="admin-pdf-actual"
+                                          >
+                                            Ver PDF actual
+                                          </a>
+                                        )}
+                                        <select
+                                          value={
+                                            OPCIONES_ETIQUETA_PDF.includes(formEdicion.menu_pdf_label)
+                                              ? formEdicion.menu_pdf_label
+                                              : "personalizado"
+                                          }
+                                          onChange={(e) => handleChangeEtiquetaPdfEdicion(e.target.value)}
+                                        >
+                                          {OPCIONES_ETIQUETA_PDF.map((opcion) => (
+                                            <option key={opcion} value={opcion}>
+                                              {opcion}
+                                            </option>
+                                          ))}
+                                          <option value="personalizado">Personalizado...</option>
+                                        </select>
+                                        {!OPCIONES_ETIQUETA_PDF.includes(formEdicion.menu_pdf_label) && (
+                                          <input
+                                            placeholder="Escribe la etiqueta del botón"
+                                            value={formEdicion.menu_pdf_label}
+                                            onChange={(e) =>
+                                              handleChangeEdicion("menu_pdf_label", e.target.value)
+                                            }
+                                          />
+                                        )}
+                                        <div className="admin-pdf-upload">
+                                          <input
+                                            type="file"
+                                            accept="application/pdf"
+                                            onChange={handlePdfChangeEdicion}
+                                          />
+                                          {subiendoPdfEdicion && (
+                                            <span className="admin-pdf-subiendo">Subiendo...</span>
+                                          )}
+                                        </div>
+                                        {errorPdfEdicion && (
+                                          <p className="admin-mensaje admin-mensaje-error">
+                                            {errorPdfEdicion}
+                                          </p>
+                                        )}
+                                      </label>
                                     </div>
                                   </div>
 
@@ -725,7 +832,7 @@ export default function AdminPage() {
                                     <button
                                       type="submit"
                                       className="admin-btn-guardar"
-                                      disabled={guardandoEdicion}
+                                      disabled={guardandoEdicion || subiendoPdfEdicion}
                                     >
                                       {guardandoEdicion ? "Guardando..." : "Guardar"}
                                     </button>

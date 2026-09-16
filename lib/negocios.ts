@@ -3,6 +3,8 @@
 import { unstable_noStore as noStore } from "next/cache";
 import { supabase } from "./supabase";
 
+export const OPCIONES_ETIQUETA_PDF = ["Menú", "Ofertas", "Información", "Productos", "Servicios"];
+
 export type Negocio = {
   slug: string;
   nombre: string;
@@ -13,6 +15,7 @@ export type Negocio = {
   facebook?: string;
   instagram?: string;
   menuPdfUrl?: string;
+  menuPdfLabel: string;
 };
 
 type NegocioRow = {
@@ -25,6 +28,7 @@ type NegocioRow = {
   facebook: string | null;
   instagram: string | null;
   menu_pdf_url: string | null;
+  menu_pdf_label: string | null;
 };
 
 function mapRow(row: NegocioRow): Negocio {
@@ -37,7 +41,8 @@ function mapRow(row: NegocioRow): Negocio {
     whatsapp: row.whatsapp ?? "",
     facebook: row.facebook ?? undefined,
     instagram: row.instagram ?? undefined,
-    menuPdfUrl: row.menu_pdf_url ?? undefined
+    menuPdfUrl: row.menu_pdf_url ?? undefined,
+    menuPdfLabel: row.menu_pdf_label ?? "Menú"
   };
 }
 

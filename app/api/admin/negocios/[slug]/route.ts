@@ -24,7 +24,9 @@ export async function PATCH(request: Request, { params }: { params: { slug: stri
       instagram: body.instagram || null,
       tiktok: body.tiktok || null,
       logo_url: body.logo_url || null,
-      email_dueno: body.email_dueno || null
+      email_dueno: body.email_dueno || null,
+      menu_pdf_url: body.menu_pdf_url || null,
+      menu_pdf_label: body.menu_pdf_label || null
     })
     .eq("slug", params.slug);
 

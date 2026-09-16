@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 import type { PuntoSerie } from "@/lib/eventos";
 import { GraficaSerie } from "./grafica-serie";
 import { IconoFacebook, IconoGoogle, IconoInstagram, IconoTikTok, IconoWhatsApp } from "@/components/iconos";
+import { OPCIONES_ETIQUETA_PDF } from "@/lib/negocios";
 import "./mi-negocio.css";
 
 type NegocioRow = {
@@ -19,6 +20,7 @@ type NegocioRow = {
   tiktok: string | null;
   google_review_url: string | null;
   menu_pdf_url: string | null;
+  menu_pdf_label: string | null;
 };
 
 type FormNegocio = {
@@ -30,6 +32,7 @@ type FormNegocio = {
   tiktok: string;
   google_review_url: string;
   menu_pdf_url: string;
+  menu_pdf_label: string;
 };
 
 type Metricas = {
@@ -49,7 +52,8 @@ const FORM_VACIO: FormNegocio = {
   instagram: "",
   tiktok: "",
   google_review_url: "",
-  menu_pdf_url: ""
+  menu_pdf_url: "",
+  menu_pdf_label: "Menú"
 };
 
 export default function MiNegocioPage() {
@@ -93,7 +97,8 @@ export default function MiNegocioPage() {
         instagram: row.instagram ?? "",
         tiktok: row.tiktok ?? "",
         google_review_url: row.google_review_url ?? "",
-        menu_pdf_url: row.menu_pdf_url ?? ""
+        menu_pdf_url: row.menu_pdf_url ?? "",
+        menu_pdf_label: row.menu_pdf_label ?? "Menú"
       });
       setCargando(false);
 
@@ -125,6 +130,18 @@ export default function MiNegocioPage() {
 
   function handleChange(campo: keyof FormNegocio, valor: string) {
     setForm((prev) => ({ ...prev, [campo]: valor }));
+  }
+
+  function handleChangeEtiquetaPdf(valor: string) {
+    if (valor === "personalizado") {
+      setForm((prev) => ({
+        ...prev,
+        menu_pdf_label: OPCIONES_ETIQUETA_PDF.includes(prev.menu_pdf_label) ? "" : prev.menu_pdf_label
+      }));
+      return;
+    }
+
+    handleChange("menu_pdf_label", valor);
   }
 
   async function handlePdfChange(e: ChangeEvent<HTMLInputElement>) {
@@ -287,6 +304,28 @@ export default function MiNegocioPage() {
                       >
                         Ver PDF actual
                       </a>
+                    )}
+                    <select
+                      value={
+                        OPCIONES_ETIQUETA_PDF.includes(form.menu_pdf_label)
+                          ? form.menu_pdf_label
+                          : "personalizado"
+                      }
+                      onChange={(e) => handleChangeEtiquetaPdf(e.target.value)}
+                    >
+                      {OPCIONES_ETIQUETA_PDF.map((opcion) => (
+                        <option key={opcion} value={opcion}>
+                          {opcion}
+                        </option>
+                      ))}
+                      <option value="personalizado">Personalizado...</option>
+                    </select>
+                    {!OPCIONES_ETIQUETA_PDF.includes(form.menu_pdf_label) && (
+                      <input
+                        placeholder="Escribe la etiqueta del botón"
+                        value={form.menu_pdf_label}
+                        onChange={(e) => handleChange("menu_pdf_label", e.target.value)}
+                      />
                     )}
                     <div className="mn-pdf-upload">
                       <input type="file" accept="application/pdf" onChange={handlePdfChange} />

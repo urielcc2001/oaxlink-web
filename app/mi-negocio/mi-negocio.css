@@ -286,7 +286,8 @@
 }
 
 .mn-form-card input,
-.mn-form-card textarea {
+.mn-form-card textarea,
+.mn-form-card select {
   background: var(--ink);
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -297,7 +298,8 @@
 }
 
 .mn-form-card input:focus,
-.mn-form-card textarea:focus {
+.mn-form-card textarea:focus,
+.mn-form-card select:focus {
   outline: none;
   border-color: var(--gold);
 }

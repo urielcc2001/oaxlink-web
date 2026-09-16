@@ -40,3 +40,7 @@ create index if not exists eventos_negocio_idx on eventos(negocio_slug, created_
 
 -- Corre esto si tu tabla `negocios` ya existía antes de agregar TikTok al panel del dueño.
 alter table negocios add column if not exists tiktok text;
+
+-- Corre esto si tu tabla `negocios` ya existía antes de agregar la etiqueta
+-- personalizable del botón de PDF (por defecto se muestra "Menú").
+alter table negocios add column if not exists menu_pdf_label text;

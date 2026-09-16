@@ -308,6 +308,39 @@
   font-size: 0.92rem;
 }
 
+.admin-pdf-actual {
+  color: var(--gold);
+  font-size: 0.85rem;
+  width: fit-content;
+}
+
+.admin-pdf-actual:hover {
+  text-decoration: underline;
+}
+
+.admin-pdf-upload {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-pdf-upload input[type="file"] {
+  flex: 1;
+  background: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+
+.admin-pdf-subiendo {
+  color: var(--gold);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
 .admin-btn-guardar {
   align-self: flex-start;
   background: var(--gold);
