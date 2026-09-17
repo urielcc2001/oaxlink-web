@@ -5,6 +5,14 @@ import { supabase } from "./supabase";
 
 export const OPCIONES_ETIQUETA_PDF = ["Menú", "Ofertas", "Información", "Productos", "Servicios"];
 
+// Detecta si una URL de menu_pdf_url viene de nuestro bucket de Supabase Storage
+// (subida con el input de archivo) o fue pegada a mano (Google Drive, Dropbox, etc.).
+export function esUrlDeStorageMenus(url: string): boolean {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+  if (!supabaseUrl || !url) return false;
+  return url.startsWith(`${supabaseUrl}/storage/v1/object/public/menus/`);
+}
+
 export type Negocio = {
   slug: string;
   nombre: string;

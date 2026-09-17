@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase";
 import type { PuntoSerie } from "@/lib/eventos";
 import { GraficaSerie } from "./grafica-serie";
 import { IconoFacebook, IconoGoogle, IconoInstagram, IconoTikTok, IconoWhatsApp } from "@/components/iconos";
-import { OPCIONES_ETIQUETA_PDF } from "@/lib/negocios";
+import { OPCIONES_ETIQUETA_PDF, esUrlDeStorageMenus } from "@/lib/negocios";
 import "./mi-negocio.css";
 
 type NegocioRow = {
@@ -76,6 +76,7 @@ export default function MiNegocioPage() {
   const [seccion, setSeccion] = useState<Seccion>("metricas");
   const [subiendoPdf, setSubiendoPdf] = useState(false);
   const [errorPdf, setErrorPdf] = useState<string | null>(null);
+  const [metodoPdf, setMetodoPdf] = useState<"archivo" | "link">("archivo");
 
   useEffect(() => {
     let cargado = false;
@@ -112,6 +113,7 @@ export default function MiNegocioPage() {
         titular_cuenta: row.titular_cuenta ?? "",
         clabe: row.clabe ?? ""
       });
+      setMetodoPdf(row.menu_pdf_url && !esUrlDeStorageMenus(row.menu_pdf_url) ? "link" : "archivo");
       setCargando(false);
 
       fetch("/api/mi-negocio/metricas", {
@@ -339,10 +341,40 @@ export default function MiNegocioPage() {
                         onChange={(e) => handleChange("menu_pdf_label", e.target.value)}
                       />
                     )}
-                    <div className="mn-pdf-upload">
-                      <input type="file" accept="application/pdf" onChange={handlePdfChange} />
-                      {subiendoPdf && <span className="mn-pdf-subiendo">Subiendo...</span>}
+                    <div className="mn-pdf-tabs">
+                      <button
+                        type="button"
+                        className={`mn-pdf-tab ${metodoPdf === "archivo" ? "is-active" : ""}`}
+                        onClick={() => setMetodoPdf("archivo")}
+                      >
+                        Subir archivo
+                      </button>
+                      <button
+                        type="button"
+                        className={`mn-pdf-tab ${metodoPdf === "link" ? "is-active" : ""}`}
+                        onClick={() => setMetodoPdf("link")}
+                      >
+                        Pegar link
+                      </button>
                     </div>
+                    {metodoPdf === "archivo" ? (
+                      <div className="mn-pdf-upload">
+                        <input type="file" accept="application/pdf" onChange={handlePdfChange} />
+                        {subiendoPdf && <span className="mn-pdf-subiendo">Subiendo...</span>}
+                      </div>
+                    ) : (
+                      <div className="mn-pdf-link">
+                        <input
+                          type="url"
+                          placeholder="https://drive.google.com/..."
+                          value={form.menu_pdf_url}
+                          onChange={(e) => handleChange("menu_pdf_url", e.target.value)}
+                        />
+                        <p className="mn-form-nota">
+                          Asegúrate de que el link sea público (cualquiera con el enlace puede ver).
+                        </p>
+                      </div>
+                    )}
                     {errorPdf && <p className="mn-mensaje mn-mensaje-error">{errorPdf}</p>}
                   </label>
                 </div>

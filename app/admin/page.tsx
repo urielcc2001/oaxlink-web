@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { IconoFacebook, IconoGoogle, IconoInstagram, IconoTikTok, IconoWhatsApp } from "@/components/iconos";
-import { OPCIONES_ETIQUETA_PDF } from "@/lib/negocios";
+import { OPCIONES_ETIQUETA_PDF, esUrlDeStorageMenus } from "@/lib/negocios";
 import { esEmailAdmin } from "@/lib/admin-emails";
 import "./admin.css";
 
@@ -136,6 +136,7 @@ export default function AdminPage() {
   const [errorEdicion, setErrorEdicion] = useState<string | null>(null);
   const [subiendoPdfEdicion, setSubiendoPdfEdicion] = useState(false);
   const [errorPdfEdicion, setErrorPdfEdicion] = useState<string | null>(null);
+  const [metodoPdfEdicion, setMetodoPdfEdicion] = useState<"archivo" | "link">("archivo");
 
   const [toast, setToast] = useState<string | null>(null);
 
@@ -317,6 +318,7 @@ export default function AdminPage() {
       titular_cuenta: n.titular_cuenta ?? "",
       clabe: n.clabe ?? ""
     });
+    setMetodoPdfEdicion(n.menu_pdf_url && !esUrlDeStorageMenus(n.menu_pdf_url) ? "link" : "archivo");
   }
 
   function handleChangeEdicion(campo: keyof NegocioEditForm, valor: string) {
@@ -796,16 +798,53 @@ export default function AdminPage() {
                                             }
                                           />
                                         )}
-                                        <div className="admin-pdf-upload">
-                                          <input
-                                            type="file"
-                                            accept="application/pdf"
-                                            onChange={handlePdfChangeEdicion}
-                                          />
-                                          {subiendoPdfEdicion && (
-                                            <span className="admin-pdf-subiendo">Subiendo...</span>
-                                          )}
+                                        <div className="admin-pdf-tabs">
+                                          <button
+                                            type="button"
+                                            className={`admin-pdf-tab ${
+                                              metodoPdfEdicion === "archivo" ? "is-active" : ""
+                                            }`}
+                                            onClick={() => setMetodoPdfEdicion("archivo")}
+                                          >
+                                            Subir archivo
+                                          </button>
+                                          <button
+                                            type="button"
+                                            className={`admin-pdf-tab ${
+                                              metodoPdfEdicion === "link" ? "is-active" : ""
+                                            }`}
+                                            onClick={() => setMetodoPdfEdicion("link")}
+                                          >
+                                            Pegar link
+                                          </button>
                                         </div>
+                                        {metodoPdfEdicion === "archivo" ? (
+                                          <div className="admin-pdf-upload">
+                                            <input
+                                              type="file"
+                                              accept="application/pdf"
+                                              onChange={handlePdfChangeEdicion}
+                                            />
+                                            {subiendoPdfEdicion && (
+                                              <span className="admin-pdf-subiendo">Subiendo...</span>
+                                            )}
+                                          </div>
+                                        ) : (
+                                          <div className="admin-pdf-link">
+                                            <input
+                                              type="url"
+                                              placeholder="https://drive.google.com/..."
+                                              value={formEdicion.menu_pdf_url}
+                                              onChange={(e) =>
+                                                handleChangeEdicion("menu_pdf_url", e.target.value)
+                                              }
+                                            />
+                                            <p className="admin-form-nota">
+                                              Asegúrate de que el link sea público (cualquiera con el
+                                              enlace puede ver).
+                                            </p>
+                                          </div>
+                                        )}
                                         {errorPdfEdicion && (
                                           <p className="admin-mensaje admin-mensaje-error">
                                             {errorPdfEdicion}

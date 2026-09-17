@@ -362,10 +362,46 @@
   text-decoration: underline;
 }
 
+.mn-pdf-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.mn-pdf-tab {
+  background: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 12px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.mn-pdf-tab.is-active {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
 .mn-pdf-upload {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.mn-pdf-link {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mn-pdf-link input {
+  background: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: inherit;
+  font-size: 0.85rem;
+  font-family: inherit;
 }
 
 .mn-pdf-upload input[type="file"] {
