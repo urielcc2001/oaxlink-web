@@ -5,12 +5,20 @@ import { supabase } from "./supabase";
 
 export const OPCIONES_ETIQUETA_PDF = ["Menú", "Ofertas", "Información", "Productos", "Servicios"];
 
-// Detecta si una URL de menu_pdf_url viene de nuestro bucket de Supabase Storage
-// (subida con el input de archivo) o fue pegada a mano (Google Drive, Dropbox, etc.).
-export function esUrlDeStorageMenus(url: string): boolean {
+// Detecta si una URL viene de nuestro bucket de Supabase Storage (subida con
+// el input de archivo) o fue pegada a mano (Google Drive, Dropbox, etc.).
+function esUrlDeStorage(url: string, bucket: string): boolean {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
   if (!supabaseUrl || !url) return false;
-  return url.startsWith(`${supabaseUrl}/storage/v1/object/public/menus/`);
+  return url.startsWith(`${supabaseUrl}/storage/v1/object/public/${bucket}/`);
+}
+
+export function esUrlDeStorageMenus(url: string): boolean {
+  return esUrlDeStorage(url, "menus");
+}
+
+export function esUrlDeStorageLogos(url: string): boolean {
+  return esUrlDeStorage(url, "logos");
 }
 
 export type Negocio = {

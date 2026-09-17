@@ -362,12 +362,12 @@
   text-decoration: underline;
 }
 
-.mn-pdf-tabs {
+.mn-toggle-tabs {
   display: flex;
   gap: 8px;
 }
 
-.mn-pdf-tab {
+.mn-toggle-tab {
   background: var(--ink);
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -377,24 +377,24 @@
   cursor: pointer;
 }
 
-.mn-pdf-tab.is-active {
+.mn-toggle-tab.is-active {
   border-color: var(--gold);
   color: var(--gold);
 }
 
-.mn-pdf-upload {
+.mn-file-upload {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.mn-pdf-link {
+.mn-link-field {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.mn-pdf-link input {
+.mn-link-field input {
   background: var(--ink);
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -404,7 +404,7 @@
   font-family: inherit;
 }
 
-.mn-pdf-upload input[type="file"] {
+.mn-file-upload input[type="file"] {
   flex: 1;
   background: var(--ink);
   border: 1px solid var(--line);
@@ -415,10 +415,18 @@
   font-family: inherit;
 }
 
-.mn-pdf-subiendo {
+.mn-file-subiendo {
   color: var(--gold);
   font-size: 0.85rem;
   white-space: nowrap;
+}
+
+.mn-logo-preview {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--line);
 }
 
 .mn-btn-guardar {

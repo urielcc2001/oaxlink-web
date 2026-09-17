@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { IconoFacebook, IconoGoogle, IconoInstagram, IconoTikTok, IconoWhatsApp } from "@/components/iconos";
-import { OPCIONES_ETIQUETA_PDF, esUrlDeStorageMenus } from "@/lib/negocios";
+import { OPCIONES_ETIQUETA_PDF, esUrlDeStorageMenus, esUrlDeStorageLogos } from "@/lib/negocios";
 import { esEmailAdmin } from "@/lib/admin-emails";
 import "./admin.css";
 
@@ -125,6 +125,9 @@ export default function AdminPage() {
   const [guardandoNegocio, setGuardandoNegocio] = useState(false);
   const [errorNegocio, setErrorNegocio] = useState<string | null>(null);
   const [credencialesCreadas, setCredencialesCreadas] = useState<CredencialesCreadas | null>(null);
+  const [subiendoLogoNegocio, setSubiendoLogoNegocio] = useState(false);
+  const [errorLogoNegocio, setErrorLogoNegocio] = useState<string | null>(null);
+  const [metodoLogoNegocio, setMetodoLogoNegocio] = useState<"archivo" | "link">("archivo");
 
   const [formPlaca, setFormPlaca] = useState<PlacaForm>(PLACA_VACIA);
   const [guardandoPlaca, setGuardandoPlaca] = useState(false);
@@ -137,6 +140,9 @@ export default function AdminPage() {
   const [subiendoPdfEdicion, setSubiendoPdfEdicion] = useState(false);
   const [errorPdfEdicion, setErrorPdfEdicion] = useState<string | null>(null);
   const [metodoPdfEdicion, setMetodoPdfEdicion] = useState<"archivo" | "link">("archivo");
+  const [subiendoLogoEdicion, setSubiendoLogoEdicion] = useState(false);
+  const [errorLogoEdicion, setErrorLogoEdicion] = useState<string | null>(null);
+  const [metodoLogoEdicion, setMetodoLogoEdicion] = useState<"archivo" | "link">("archivo");
 
   const [toast, setToast] = useState<string | null>(null);
 
@@ -191,6 +197,38 @@ export default function AdminPage() {
 
   function handleChangeNegocio(campo: keyof NegocioForm, valor: string) {
     setFormNegocio((prev) => ({ ...prev, [campo]: valor }));
+  }
+
+  async function handleLogoChangeNegocio(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    if (!formNegocio.slug) {
+      setErrorLogoNegocio("Escribe primero el slug del negocio.");
+      return;
+    }
+
+    setErrorLogoNegocio(null);
+    setSubiendoLogoNegocio(true);
+
+    const path = `${formNegocio.slug}/${Date.now()}-${file.name}`;
+    const { error: uploadError } = await supabase.storage
+      .from("logos")
+      .upload(path, file, { upsert: true });
+
+    if (uploadError) {
+      setSubiendoLogoNegocio(false);
+      setErrorLogoNegocio("No se pudo subir el logo. Intenta de nuevo.");
+      return;
+    }
+
+    const {
+      data: { publicUrl }
+    } = supabase.storage.from("logos").getPublicUrl(path);
+
+    setFormNegocio((prev) => ({ ...prev, logo_url: publicUrl }));
+    setSubiendoLogoNegocio(false);
   }
 
   async function handleSubmitNegocio(e: FormEvent) {
@@ -250,6 +288,8 @@ export default function AdminPage() {
     ]);
     setCredencialesCreadas({ slug: datos.slug, email: datos.email, password: datos.password });
     setFormNegocio(NEGOCIO_VACIO);
+    setMetodoLogoNegocio("archivo");
+    setErrorLogoNegocio(null);
     mostrarToast("Negocio creado correctamente.");
   }
 
@@ -302,6 +342,7 @@ export default function AdminPage() {
     setEditandoSlug(n.slug);
     setErrorEdicion(null);
     setErrorPdfEdicion(null);
+    setErrorLogoEdicion(null);
     setFormEdicion({
       nombre: n.nombre ?? "",
       bio: n.bio ?? "",
@@ -319,6 +360,7 @@ export default function AdminPage() {
       clabe: n.clabe ?? ""
     });
     setMetodoPdfEdicion(n.menu_pdf_url && !esUrlDeStorageMenus(n.menu_pdf_url) ? "link" : "archivo");
+    setMetodoLogoEdicion(n.logo_url && !esUrlDeStorageLogos(n.logo_url) ? "link" : "archivo");
   }
 
   function handleChangeEdicion(campo: keyof NegocioEditForm, valor: string) {
@@ -362,6 +404,33 @@ export default function AdminPage() {
 
     setFormEdicion((prev) => ({ ...prev, menu_pdf_url: publicUrl }));
     setSubiendoPdfEdicion(false);
+  }
+
+  async function handleLogoChangeEdicion(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !editandoSlug) return;
+
+    setErrorLogoEdicion(null);
+    setSubiendoLogoEdicion(true);
+
+    const path = `${editandoSlug}/${Date.now()}-${file.name}`;
+    const { error: uploadError } = await supabase.storage.from("logos").upload(path, file, {
+      upsert: true
+    });
+
+    if (uploadError) {
+      setSubiendoLogoEdicion(false);
+      setErrorLogoEdicion("No se pudo subir el logo. Intenta de nuevo.");
+      return;
+    }
+
+    const {
+      data: { publicUrl }
+    } = supabase.storage.from("logos").getPublicUrl(path);
+
+    setFormEdicion((prev) => ({ ...prev, logo_url: publicUrl }));
+    setSubiendoLogoEdicion(false);
   }
 
   async function handleGuardarEdicion(e: FormEvent) {
@@ -541,11 +610,54 @@ export default function AdminPage() {
                     />
                   </label>
                   <label>
-                    Logo (URL)
-                    <input
-                      value={formNegocio.logo_url}
-                      onChange={(e) => handleChangeNegocio("logo_url", e.target.value)}
-                    />
+                    Logo
+                    {formNegocio.logo_url && (
+                      <img src={formNegocio.logo_url} alt="Logo actual" className="admin-logo-preview" />
+                    )}
+                    <div className="admin-toggle-tabs">
+                      <button
+                        type="button"
+                        className={`admin-toggle-tab ${
+                          metodoLogoNegocio === "archivo" ? "is-active" : ""
+                        }`}
+                        onClick={() => setMetodoLogoNegocio("archivo")}
+                      >
+                        Subir archivo
+                      </button>
+                      <button
+                        type="button"
+                        className={`admin-toggle-tab ${metodoLogoNegocio === "link" ? "is-active" : ""}`}
+                        onClick={() => setMetodoLogoNegocio("link")}
+                      >
+                        Pegar link
+                      </button>
+                    </div>
+                    {metodoLogoNegocio === "archivo" ? (
+                      <div className="admin-file-upload">
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          onChange={handleLogoChangeNegocio}
+                        />
+                        {subiendoLogoNegocio && <span className="admin-file-subiendo">Subiendo...</span>}
+                      </div>
+                    ) : (
+                      <div className="admin-link-field">
+                        <input
+                          type="url"
+                          placeholder="https://..."
+                          value={formNegocio.logo_url}
+                          onChange={(e) => handleChangeNegocio("logo_url", e.target.value)}
+                        />
+                        <p className="admin-form-nota">
+                          Debe ser una URL pública y permanente. Los links de Facebook o Google Maps
+                          caducan y no sirven aquí.
+                        </p>
+                      </div>
+                    )}
+                    {errorLogoNegocio && (
+                      <p className="admin-mensaje admin-mensaje-error">{errorLogoNegocio}</p>
+                    )}
                   </label>
                   <label>
                     Email del dueño
@@ -648,7 +760,11 @@ export default function AdminPage() {
 
                 {errorNegocio && <p className="admin-mensaje admin-mensaje-error">{errorNegocio}</p>}
 
-                <button type="submit" className="admin-btn-guardar" disabled={guardandoNegocio}>
+                <button
+                  type="submit"
+                  className="admin-btn-guardar"
+                  disabled={guardandoNegocio || subiendoLogoNegocio}
+                >
                   {guardandoNegocio ? "Creando..." : "Crear negocio"}
                 </button>
               </form>
@@ -755,12 +871,67 @@ export default function AdminPage() {
                                           onChange={(e) => handleChangeEdicion("bio", e.target.value)}
                                         />
                                       </label>
-                                      <label>
-                                        Logo (URL)
-                                        <input
-                                          value={formEdicion.logo_url}
-                                          onChange={(e) => handleChangeEdicion("logo_url", e.target.value)}
-                                        />
+                                      <label className="admin-form-full">
+                                        Logo
+                                        {formEdicion.logo_url && (
+                                          <img
+                                            src={formEdicion.logo_url}
+                                            alt="Logo actual"
+                                            className="admin-logo-preview"
+                                          />
+                                        )}
+                                        <div className="admin-toggle-tabs">
+                                          <button
+                                            type="button"
+                                            className={`admin-toggle-tab ${
+                                              metodoLogoEdicion === "archivo" ? "is-active" : ""
+                                            }`}
+                                            onClick={() => setMetodoLogoEdicion("archivo")}
+                                          >
+                                            Subir archivo
+                                          </button>
+                                          <button
+                                            type="button"
+                                            className={`admin-toggle-tab ${
+                                              metodoLogoEdicion === "link" ? "is-active" : ""
+                                            }`}
+                                            onClick={() => setMetodoLogoEdicion("link")}
+                                          >
+                                            Pegar link
+                                          </button>
+                                        </div>
+                                        {metodoLogoEdicion === "archivo" ? (
+                                          <div className="admin-file-upload">
+                                            <input
+                                              type="file"
+                                              accept="image/jpeg,image/png,image/webp"
+                                              onChange={handleLogoChangeEdicion}
+                                            />
+                                            {subiendoLogoEdicion && (
+                                              <span className="admin-file-subiendo">Subiendo...</span>
+                                            )}
+                                          </div>
+                                        ) : (
+                                          <div className="admin-link-field">
+                                            <input
+                                              type="url"
+                                              placeholder="https://..."
+                                              value={formEdicion.logo_url}
+                                              onChange={(e) =>
+                                                handleChangeEdicion("logo_url", e.target.value)
+                                              }
+                                            />
+                                            <p className="admin-form-nota">
+                                              Debe ser una URL pública y permanente. Los links de
+                                              Facebook o Google Maps caducan y no sirven aquí.
+                                            </p>
+                                          </div>
+                                        )}
+                                        {errorLogoEdicion && (
+                                          <p className="admin-mensaje admin-mensaje-error">
+                                            {errorLogoEdicion}
+                                          </p>
+                                        )}
                                       </label>
                                       <label className="admin-form-full">
                                         Menú / avisos (PDF)
@@ -798,10 +969,10 @@ export default function AdminPage() {
                                             }
                                           />
                                         )}
-                                        <div className="admin-pdf-tabs">
+                                        <div className="admin-toggle-tabs">
                                           <button
                                             type="button"
-                                            className={`admin-pdf-tab ${
+                                            className={`admin-toggle-tab ${
                                               metodoPdfEdicion === "archivo" ? "is-active" : ""
                                             }`}
                                             onClick={() => setMetodoPdfEdicion("archivo")}
@@ -810,7 +981,7 @@ export default function AdminPage() {
                                           </button>
                                           <button
                                             type="button"
-                                            className={`admin-pdf-tab ${
+                                            className={`admin-toggle-tab ${
                                               metodoPdfEdicion === "link" ? "is-active" : ""
                                             }`}
                                             onClick={() => setMetodoPdfEdicion("link")}
@@ -819,18 +990,18 @@ export default function AdminPage() {
                                           </button>
                                         </div>
                                         {metodoPdfEdicion === "archivo" ? (
-                                          <div className="admin-pdf-upload">
+                                          <div className="admin-file-upload">
                                             <input
                                               type="file"
                                               accept="application/pdf"
                                               onChange={handlePdfChangeEdicion}
                                             />
                                             {subiendoPdfEdicion && (
-                                              <span className="admin-pdf-subiendo">Subiendo...</span>
+                                              <span className="admin-file-subiendo">Subiendo...</span>
                                             )}
                                           </div>
                                         ) : (
-                                          <div className="admin-pdf-link">
+                                          <div className="admin-link-field">
                                             <input
                                               type="url"
                                               placeholder="https://drive.google.com/..."
@@ -954,7 +1125,7 @@ export default function AdminPage() {
                                     <button
                                       type="submit"
                                       className="admin-btn-guardar"
-                                      disabled={guardandoEdicion || subiendoPdfEdicion}
+                                      disabled={guardandoEdicion || subiendoPdfEdicion || subiendoLogoEdicion}
                                     >
                                       {guardandoEdicion ? "Guardando..." : "Guardar"}
                                     </button>

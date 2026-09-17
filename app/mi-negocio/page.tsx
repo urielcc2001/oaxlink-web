@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase";
 import type { PuntoSerie } from "@/lib/eventos";
 import { GraficaSerie } from "./grafica-serie";
 import { IconoFacebook, IconoGoogle, IconoInstagram, IconoTikTok, IconoWhatsApp } from "@/components/iconos";
-import { OPCIONES_ETIQUETA_PDF, esUrlDeStorageMenus } from "@/lib/negocios";
+import { OPCIONES_ETIQUETA_PDF, esUrlDeStorageMenus, esUrlDeStorageLogos } from "@/lib/negocios";
 import "./mi-negocio.css";
 
 type NegocioRow = {
@@ -19,6 +19,7 @@ type NegocioRow = {
   instagram: string | null;
   tiktok: string | null;
   google_review_url: string | null;
+  logo_url: string | null;
   menu_pdf_url: string | null;
   menu_pdf_label: string | null;
   banco: string | null;
@@ -34,6 +35,7 @@ type FormNegocio = {
   instagram: string;
   tiktok: string;
   google_review_url: string;
+  logo_url: string;
   menu_pdf_url: string;
   menu_pdf_label: string;
   banco: string;
@@ -58,6 +60,7 @@ const FORM_VACIO: FormNegocio = {
   instagram: "",
   tiktok: "",
   google_review_url: "",
+  logo_url: "",
   menu_pdf_url: "",
   menu_pdf_label: "Menú",
   banco: "",
@@ -77,6 +80,9 @@ export default function MiNegocioPage() {
   const [subiendoPdf, setSubiendoPdf] = useState(false);
   const [errorPdf, setErrorPdf] = useState<string | null>(null);
   const [metodoPdf, setMetodoPdf] = useState<"archivo" | "link">("archivo");
+  const [subiendoLogo, setSubiendoLogo] = useState(false);
+  const [errorLogo, setErrorLogo] = useState<string | null>(null);
+  const [metodoLogo, setMetodoLogo] = useState<"archivo" | "link">("archivo");
 
   useEffect(() => {
     let cargado = false;
@@ -107,6 +113,7 @@ export default function MiNegocioPage() {
         instagram: row.instagram ?? "",
         tiktok: row.tiktok ?? "",
         google_review_url: row.google_review_url ?? "",
+        logo_url: row.logo_url ?? "",
         menu_pdf_url: row.menu_pdf_url ?? "",
         menu_pdf_label: row.menu_pdf_label ?? "Menú",
         banco: row.banco ?? "",
@@ -114,6 +121,7 @@ export default function MiNegocioPage() {
         clabe: row.clabe ?? ""
       });
       setMetodoPdf(row.menu_pdf_url && !esUrlDeStorageMenus(row.menu_pdf_url) ? "link" : "archivo");
+      setMetodoLogo(row.logo_url && !esUrlDeStorageLogos(row.logo_url) ? "link" : "archivo");
       setCargando(false);
 
       fetch("/api/mi-negocio/metricas", {
@@ -183,6 +191,33 @@ export default function MiNegocioPage() {
 
     setForm((prev) => ({ ...prev, menu_pdf_url: publicUrl }));
     setSubiendoPdf(false);
+  }
+
+  async function handleLogoChange(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !negocio) return;
+
+    setErrorLogo(null);
+    setSubiendoLogo(true);
+
+    const path = `${negocio.slug}/${Date.now()}-${file.name}`;
+    const { error: uploadError } = await supabase.storage
+      .from("logos")
+      .upload(path, file, { upsert: true });
+
+    if (uploadError) {
+      setSubiendoLogo(false);
+      setErrorLogo("No se pudo subir el logo. Intenta de nuevo.");
+      return;
+    }
+
+    const {
+      data: { publicUrl }
+    } = supabase.storage.from("logos").getPublicUrl(path);
+
+    setForm((prev) => ({ ...prev, logo_url: publicUrl }));
+    setSubiendoLogo(false);
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -308,6 +343,48 @@ export default function MiNegocioPage() {
                     <textarea value={form.bio} onChange={(e) => handleChange("bio", e.target.value)} />
                   </label>
                   <label>
+                    Logo
+                    {form.logo_url && (
+                      <img src={form.logo_url} alt="Logo actual" className="mn-logo-preview" />
+                    )}
+                    <div className="mn-toggle-tabs">
+                      <button
+                        type="button"
+                        className={`mn-toggle-tab ${metodoLogo === "archivo" ? "is-active" : ""}`}
+                        onClick={() => setMetodoLogo("archivo")}
+                      >
+                        Subir archivo
+                      </button>
+                      <button
+                        type="button"
+                        className={`mn-toggle-tab ${metodoLogo === "link" ? "is-active" : ""}`}
+                        onClick={() => setMetodoLogo("link")}
+                      >
+                        Pegar link
+                      </button>
+                    </div>
+                    {metodoLogo === "archivo" ? (
+                      <div className="mn-file-upload">
+                        <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleLogoChange} />
+                        {subiendoLogo && <span className="mn-file-subiendo">Subiendo...</span>}
+                      </div>
+                    ) : (
+                      <div className="mn-link-field">
+                        <input
+                          type="url"
+                          placeholder="https://..."
+                          value={form.logo_url}
+                          onChange={(e) => handleChange("logo_url", e.target.value)}
+                        />
+                        <p className="mn-form-nota">
+                          Debe ser una URL pública y permanente. Los links de Facebook o Google Maps
+                          caducan y no sirven aquí.
+                        </p>
+                      </div>
+                    )}
+                    {errorLogo && <p className="mn-mensaje mn-mensaje-error">{errorLogo}</p>}
+                  </label>
+                  <label>
                     Menú / avisos (PDF)
                     {form.menu_pdf_url && (
                       <a
@@ -341,29 +418,29 @@ export default function MiNegocioPage() {
                         onChange={(e) => handleChange("menu_pdf_label", e.target.value)}
                       />
                     )}
-                    <div className="mn-pdf-tabs">
+                    <div className="mn-toggle-tabs">
                       <button
                         type="button"
-                        className={`mn-pdf-tab ${metodoPdf === "archivo" ? "is-active" : ""}`}
+                        className={`mn-toggle-tab ${metodoPdf === "archivo" ? "is-active" : ""}`}
                         onClick={() => setMetodoPdf("archivo")}
                       >
                         Subir archivo
                       </button>
                       <button
                         type="button"
-                        className={`mn-pdf-tab ${metodoPdf === "link" ? "is-active" : ""}`}
+                        className={`mn-toggle-tab ${metodoPdf === "link" ? "is-active" : ""}`}
                         onClick={() => setMetodoPdf("link")}
                       >
                         Pegar link
                       </button>
                     </div>
                     {metodoPdf === "archivo" ? (
-                      <div className="mn-pdf-upload">
+                      <div className="mn-file-upload">
                         <input type="file" accept="application/pdf" onChange={handlePdfChange} />
-                        {subiendoPdf && <span className="mn-pdf-subiendo">Subiendo...</span>}
+                        {subiendoPdf && <span className="mn-file-subiendo">Subiendo...</span>}
                       </div>
                     ) : (
-                      <div className="mn-pdf-link">
+                      <div className="mn-link-field">
                         <input
                           type="url"
                           placeholder="https://drive.google.com/..."
@@ -455,7 +532,11 @@ export default function MiNegocioPage() {
 
                 {mensaje && <p className="mn-mensaje">{mensaje}</p>}
 
-                <button type="submit" className="mn-btn-guardar" disabled={guardando || subiendoPdf}>
+                <button
+                  type="submit"
+                  className="mn-btn-guardar"
+                  disabled={guardando || subiendoPdf || subiendoLogo}
+                >
                   {guardando ? "Guardando..." : "Guardar cambios"}
                 </button>
               </form>
