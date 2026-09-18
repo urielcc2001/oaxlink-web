@@ -125,7 +125,7 @@ export default function LandingPage() {
           <div className="plans">
             <div className="plan">
               <div className="name">Plan Básico</div>
-              <div className="price">$350 <span>pago único</span></div>
+              <div className="price">$450 <span>pago único</span></div>
               <div className="desc">Tu placa física, lista para conectar a tus clientes desde el día uno.</div>
               <ul>
                 <li><span className="check">✓</span> Soporte acrílico + chip NFC + QR</li>
@@ -137,7 +137,7 @@ export default function LandingPage() {
             </div>
             <div className="plan featured">
               <div className="name">Plan Pro</div>
-              <div className="price">$99–149 <span>/ mes</span></div>
+              <div className="price">$99 <span>/ mes</span> <span className="price-badge">Primer mes gratis</span></div>
               <div className="desc">Todo lo del plan Básico, más el menú digital y tus métricas.</div>
               <ul>
                 <li><span className="check">✓</span> Todo lo del Plan Básico</li>
@@ -149,12 +149,13 @@ export default function LandingPage() {
             </div>
             <div className="plan">
               <div className="name">Mesas para restaurantes</div>
-              <div className="price">$800–1,200 <span>/ 5 mesas</span></div>
+              <div className="price">$333 <span>/ placa (mínimo 6)</span></div>
               <div className="desc">Placas para cada mesa, con menú y acceso a tu WiFi.</div>
               <ul>
-                <li><span className="check">✓</span> 5 placas NFC + QR para mesas</li>
+                <li><span className="check">✓</span> Placas NFC + QR para cada mesa</li>
                 <li><span className="check">✓</span> Menú digital por mesa</li>
                 <li><span className="check">✓</span> Acceso directo a tu red WiFi</li>
+                <li><span className="check">✓</span> Primer mes de Plan Pro incluido</li>
               </ul>
               <a className="btn btn-ghost" href="#contacto">Cotizar mesas</a>
             </div>
