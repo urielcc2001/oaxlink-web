@@ -194,7 +194,7 @@ export default function LandingPage() {
             <a className="btn btn-primary" href="https://wa.me/529510000000?text=Hola,%20quiero%20mi%20placa%20OaxLink" target="_blank" rel="noreferrer">
               💬 Escríbenos por WhatsApp
             </a>
-            <a className="btn btn-ghost" href="mailto:hola@oaxlink.com">hola@oaxlink.com</a>
+            <a className="btn btn-ghost" href="mailto:contacto@oaxlink.com">contacto@oaxlink.com</a>
           </div>
           <div className="support-grid">
             <div className="support-item">
