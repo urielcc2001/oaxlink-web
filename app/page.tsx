@@ -150,11 +150,11 @@ export default function LandingPage() {
             <div className="plan">
               <div className="name">Mesas para restaurantes</div>
               <div className="price">$333 <span>/ placa (mínimo 6)</span></div>
-              <div className="desc">Placas para cada mesa, con menú y acceso a tu WiFi.</div>
+              <div className="desc">Placas para cada mesa, con menú digital y datos de pago listos.</div>
               <ul>
                 <li><span className="check">✓</span> Placas NFC + QR para cada mesa</li>
                 <li><span className="check">✓</span> Menú digital por mesa</li>
-                <li><span className="check">✓</span> Acceso directo a tu red WiFi</li>
+                <li><span className="check">✓</span> Datos de pago por transferencia en cada mesa</li>
                 <li><span className="check">✓</span> Primer mes de Plan Pro incluido</li>
               </ul>
               <a className="btn btn-ghost" href="#contacto">Cotizar mesas</a>
