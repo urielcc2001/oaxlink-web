@@ -293,6 +293,18 @@
   margin-top: -0.4rem;
 }
 
+/* Estado vacío / neutro compartido (carga, "sin archivo", etc.) */
+.admin-estado-vacio {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* Placeholder de un <select required> sin elegir (ej. "Selecciona un negocio") */
+.admin-form select:invalid,
+.admin-edicion-grid select:invalid {
+  color: var(--muted);
+}
+
 .admin-credenciales {
   border-color: var(--gold);
 }
@@ -318,36 +330,106 @@
   color: var(--gold);
   font-size: 0.85rem;
   width: fit-content;
+  transition: opacity 0.15s ease;
 }
 
 .admin-pdf-actual:hover {
   text-decoration: underline;
 }
 
-.admin-toggle-tabs {
+/* Toggle tipo pastilla (Subir archivo / Pegar link) */
+.admin-toggle {
+  position: relative;
   display: flex;
-  gap: 8px;
-}
-
-.admin-toggle-tab {
   background: var(--ink);
   border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 6px 12px;
-  color: var(--muted);
-  font-size: 0.82rem;
-  cursor: pointer;
+  border-radius: 999px;
+  padding: 3px;
 }
 
-.admin-toggle-tab.is-active {
-  border-color: var(--gold);
-  color: var(--gold);
+.admin-toggle-highlight {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  background: var(--gold);
+  border-radius: 999px;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.admin-toggle-highlight.is-link {
+  transform: translateX(100%);
+}
+
+.admin-toggle-option {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+  padding: 7px 14px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+}
+
+.admin-toggle-option.is-active {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.admin-toggle-option:hover:not(.is-active) {
+  color: var(--text);
 }
 
 .admin-file-upload {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Botón de archivo personalizado (reemplaza el input nativo) */
+.admin-file-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ink-3);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 16px;
+  color: var(--text);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.admin-file-btn:hover {
+  border-color: var(--line-hover);
+  background: var(--ink-2);
+}
+
+.admin-file-btn:has(input:disabled) {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.admin-file-btn input[type="file"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .admin-link-field {
@@ -362,17 +444,6 @@
   border-radius: 8px;
   padding: 8px 10px;
   color: inherit;
-  font-size: 0.85rem;
-  font-family: inherit;
-}
-
-.admin-file-upload input[type="file"] {
-  flex: 1;
-  background: var(--ink);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 8px 10px;
-  color: var(--muted);
   font-size: 0.85rem;
   font-family: inherit;
 }
@@ -401,11 +472,30 @@
   font-weight: 600;
   font-size: 0.95rem;
   cursor: pointer;
+  transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+.admin-btn-guardar:hover:not(:disabled) {
+  filter: brightness(1.1);
 }
 
 .admin-btn-guardar:disabled {
   opacity: 0.6;
-  cursor: default;
+  cursor: not-allowed;
+}
+
+/* Foco visible consistente (anillo dorado, sin outline azul del navegador) */
+.admin-sidebar-item:focus-visible,
+.admin-btn-logout:focus-visible,
+.admin-btn-guardar:focus-visible,
+.admin-btn-ver:focus-visible,
+.admin-btn-editar:focus-visible,
+.admin-btn-eliminar:focus-visible,
+.admin-toggle-option:focus-visible,
+.admin-pdf-actual:focus-visible,
+.admin-file-btn:focus-within {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ink-2), 0 0 0 4px var(--gold);
 }
 
 /* Tabla de negocios */
@@ -442,6 +532,7 @@
 
 .admin-tabla-vacio {
   color: var(--muted);
+  font-size: 0.85rem;
   text-align: center;
   padding: 1.5rem !important;
   white-space: normal;
@@ -508,7 +599,7 @@
 .admin-btn-eliminar:disabled,
 .admin-btn-editar:disabled {
   opacity: 0.6;
-  cursor: default;
+  cursor: not-allowed;
 }
 
 /* Panel de edición inline (fila expandida) */

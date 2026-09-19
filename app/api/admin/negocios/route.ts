@@ -33,21 +33,27 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "slug y nombre son obligatorios" }, { status: 400 });
   }
 
-  if (!emailDueno || !password) {
+  if (Boolean(emailDueno) !== Boolean(password)) {
     return NextResponse.json(
-      { error: "email_dueno y password son obligatorios para crear la cuenta del dueño" },
+      { error: "Para crear la cuenta del dueño necesitas email y contraseña juntos" },
       { status: 400 }
     );
   }
 
-  const { data: userData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-    email: emailDueno,
-    password,
-    email_confirm: true
-  });
+  let userId: string | null = null;
 
-  if (authError) {
-    return NextResponse.json({ error: authError.message }, { status: 400 });
+  if (emailDueno && password) {
+    const { data: userData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+      email: emailDueno,
+      password,
+      email_confirm: true
+    });
+
+    if (authError) {
+      return NextResponse.json({ error: authError.message }, { status: 400 });
+    }
+
+    userId = userData.user.id;
   }
 
   const { error } = await supabaseAdmin.from("negocios").insert({
@@ -60,16 +66,23 @@ export async function POST(request: Request) {
     instagram: body?.instagram || null,
     tiktok: body?.tiktok || null,
     logo_url: body?.logo_url || null,
-    email_dueno: emailDueno,
+    email_dueno: emailDueno || null,
     banco: body?.banco || null,
     titular_cuenta: body?.titular_cuenta || null,
     clabe: body?.clabe || null
   });
 
   if (error) {
-    await supabaseAdmin.auth.admin.deleteUser(userData.user.id);
+    if (userId) {
+      await supabaseAdmin.auth.admin.deleteUser(userId);
+    }
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ ok: true, slug, email: emailDueno, password });
+  return NextResponse.json({
+    ok: true,
+    slug,
+    email: emailDueno || null,
+    password: password || null
+  });
 }

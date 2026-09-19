@@ -36,12 +36,25 @@
   .logo{display:flex;align-items:center;gap:10px;font-family:'Sora';font-weight:700;font-size:1.15rem;}
   .logo-mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--gold),var(--teal));display:flex;align-items:center;justify-content:center;font-size:0.85rem;color:var(--ink);font-weight:800;}
   .nav-links{display:flex;gap:32px;font-size:0.92rem;color:var(--muted);}
+  .nav-links a{transition:color .15s ease;}
   .nav-links a:hover{color:var(--text);}
   .nav-cta{
     background:var(--gold);color:var(--ink);padding:10px 20px;border-radius:10px;
     font-weight:600;font-size:0.9rem;
+    transition:filter .15s ease;
   }
+  .nav-cta:hover{filter:brightness(1.1);}
   @media(max-width:760px){.nav-links{display:none;}}
+
+  /* Foco visible consistente (anillo dorado, sin outline azul del navegador) */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--ink), 0 0 0 4px var(--gold);
+  }
 
   /* HERO */
   .hero{padding:88px 0 96px;position:relative;overflow:hidden;}
@@ -54,7 +67,7 @@
   .btn{
     display:inline-flex;align-items:center;gap:8px;
     padding:14px 26px;border-radius:12px;font-weight:600;font-size:0.95rem;
-    transition:transform .15s ease, box-shadow .15s ease;
+    transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease, filter .15s ease;
   }
   .btn:active{transform:scale(0.97);}
   .btn-primary{background:var(--gold);color:var(--ink);box-shadow:0 10px 30px rgba(217,164,65,0.25);}

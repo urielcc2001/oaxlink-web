@@ -30,6 +30,7 @@ export type Negocio = {
   whatsapp: string;
   facebook?: string;
   instagram?: string;
+  tiktok?: string;
   menuPdfUrl?: string;
   menuPdfLabel: string;
   banco?: string;
@@ -46,6 +47,7 @@ type NegocioRow = {
   whatsapp: string | null;
   facebook: string | null;
   instagram: string | null;
+  tiktok: string | null;
   menu_pdf_url: string | null;
   menu_pdf_label: string | null;
   banco: string | null;
@@ -63,6 +65,7 @@ function mapRow(row: NegocioRow): Negocio {
     whatsapp: row.whatsapp ?? "",
     facebook: row.facebook ?? undefined,
     instagram: row.instagram ?? undefined,
+    tiktok: row.tiktok ?? undefined,
     menuPdfUrl: row.menu_pdf_url ?? undefined,
     menuPdfLabel: row.menu_pdf_label ?? "Menú",
     banco: row.banco ?? undefined,

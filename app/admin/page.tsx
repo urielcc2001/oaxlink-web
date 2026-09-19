@@ -113,6 +113,54 @@ const PLACA_VACIA: PlacaForm = {
 
 type Seccion = "registrar" | "negocios" | "placa";
 
+type MetodoCarga = "archivo" | "link";
+
+function ToggleMetodo({ valor, onChange }: { valor: MetodoCarga; onChange: (valor: MetodoCarga) => void }) {
+  return (
+    <div className="admin-toggle">
+      <div className={`admin-toggle-highlight ${valor === "link" ? "is-link" : ""}`} />
+      <button
+        type="button"
+        className={`admin-toggle-option ${valor === "archivo" ? "is-active" : ""}`}
+        onClick={() => onChange("archivo")}
+      >
+        Subir archivo
+      </button>
+      <button
+        type="button"
+        className={`admin-toggle-option ${valor === "link" ? "is-active" : ""}`}
+        onClick={() => onChange("link")}
+      >
+        Pegar link
+      </button>
+    </div>
+  );
+}
+
+function BotonArchivo({
+  accept,
+  subiendo,
+  onChange
+}: {
+  accept: string;
+  subiendo: boolean;
+  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+}) {
+  return (
+    <div className="admin-file-upload">
+      <label className="admin-file-btn">
+        📎 Elegir archivo
+        <input type="file" accept={accept} onChange={onChange} disabled={subiendo} />
+      </label>
+      {subiendo ? (
+        <span className="admin-file-subiendo">Subiendo...</span>
+      ) : (
+        <span className="admin-estado-vacio">Ningún archivo seleccionado</span>
+      )}
+    </div>
+  );
+}
+
 export default function AdminPage() {
   const router = useRouter();
   const [verificando, setVerificando] = useState(true);
@@ -143,6 +191,12 @@ export default function AdminPage() {
   const [subiendoLogoEdicion, setSubiendoLogoEdicion] = useState(false);
   const [errorLogoEdicion, setErrorLogoEdicion] = useState<string | null>(null);
   const [metodoLogoEdicion, setMetodoLogoEdicion] = useState<"archivo" | "link">("archivo");
+
+  const [accesoAbiertoSlug, setAccesoAbiertoSlug] = useState<string | null>(null);
+  const [formAcceso, setFormAcceso] = useState({ email: "", password: "" });
+  const [guardandoAcceso, setGuardandoAcceso] = useState(false);
+  const [errorAcceso, setErrorAcceso] = useState<string | null>(null);
+  const [credencialesAcceso, setCredencialesAcceso] = useState<CredencialesCreadas | null>(null);
 
   const [toast, setToast] = useState<string | null>(null);
 
@@ -286,7 +340,9 @@ export default function AdminPage() {
         estado: "activo"
       }
     ]);
-    setCredencialesCreadas({ slug: datos.slug, email: datos.email, password: datos.password });
+    if (datos.email) {
+      setCredencialesCreadas({ slug: datos.slug, email: datos.email, password: datos.password });
+    }
     setFormNegocio(NEGOCIO_VACIO);
     setMetodoLogoNegocio("archivo");
     setErrorLogoNegocio(null);
@@ -361,6 +417,61 @@ export default function AdminPage() {
     });
     setMetodoPdfEdicion(n.menu_pdf_url && !esUrlDeStorageMenus(n.menu_pdf_url) ? "link" : "archivo");
     setMetodoLogoEdicion(n.logo_url && !esUrlDeStorageLogos(n.logo_url) ? "link" : "archivo");
+  }
+
+  function toggleAcceso(slug: string) {
+    if (accesoAbiertoSlug === slug) {
+      setAccesoAbiertoSlug(null);
+      return;
+    }
+
+    setAccesoAbiertoSlug(slug);
+    setErrorAcceso(null);
+    setFormAcceso({ email: "", password: "" });
+  }
+
+  function handleChangeAcceso(campo: "email" | "password", valor: string) {
+    setFormAcceso((prev) => ({ ...prev, [campo]: valor }));
+  }
+
+  async function handleCrearAcceso(e: FormEvent, slug: string) {
+    e.preventDefault();
+    setGuardandoAcceso(true);
+    setErrorAcceso(null);
+
+    const {
+      data: { session }
+    } = await supabase.auth.getSession();
+
+    if (!session) {
+      setGuardandoAcceso(false);
+      router.replace("/login");
+      return;
+    }
+
+    const res = await fetch(`/api/admin/negocios/${slug}/acceso`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.access_token}`
+      },
+      body: JSON.stringify(formAcceso)
+    });
+
+    const datos = await res.json().catch(() => null);
+    setGuardandoAcceso(false);
+
+    if (!res.ok) {
+      setErrorAcceso(datos?.error ?? "No se pudo crear el acceso.");
+      return;
+    }
+
+    setNegocios((prev) =>
+      prev.map((n) => (n.slug === slug ? { ...n, email_dueno: datos.email } : n))
+    );
+    setCredencialesAcceso({ slug, email: datos.email, password: datos.password });
+    setAccesoAbiertoSlug(null);
+    mostrarToast("Acceso creado correctamente.");
   }
 
   function handleChangeEdicion(campo: keyof NegocioEditForm, valor: string) {
@@ -614,33 +725,13 @@ export default function AdminPage() {
                     {formNegocio.logo_url && (
                       <img src={formNegocio.logo_url} alt="Logo actual" className="admin-logo-preview" />
                     )}
-                    <div className="admin-toggle-tabs">
-                      <button
-                        type="button"
-                        className={`admin-toggle-tab ${
-                          metodoLogoNegocio === "archivo" ? "is-active" : ""
-                        }`}
-                        onClick={() => setMetodoLogoNegocio("archivo")}
-                      >
-                        Subir archivo
-                      </button>
-                      <button
-                        type="button"
-                        className={`admin-toggle-tab ${metodoLogoNegocio === "link" ? "is-active" : ""}`}
-                        onClick={() => setMetodoLogoNegocio("link")}
-                      >
-                        Pegar link
-                      </button>
-                    </div>
+                    <ToggleMetodo valor={metodoLogoNegocio} onChange={setMetodoLogoNegocio} />
                     {metodoLogoNegocio === "archivo" ? (
-                      <div className="admin-file-upload">
-                        <input
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp"
-                          onChange={handleLogoChangeNegocio}
-                        />
-                        {subiendoLogoNegocio && <span className="admin-file-subiendo">Subiendo...</span>}
-                      </div>
+                      <BotonArchivo
+                        accept="image/jpeg,image/png,image/webp"
+                        subiendo={subiendoLogoNegocio}
+                        onChange={handleLogoChangeNegocio}
+                      />
                     ) : (
                       <div className="admin-link-field">
                         <input
@@ -803,6 +894,7 @@ export default function AdminPage() {
                       <tr>
                         <th>Nombre</th>
                         <th>Slug</th>
+                        <th>Correo</th>
                         <th>Plan</th>
                         <th>Estado</th>
                         <th></th>
@@ -814,6 +906,15 @@ export default function AdminPage() {
                           <tr>
                             <td>{n.nombre}</td>
                             <td>{n.slug}</td>
+                            <td>
+                              {n.email_dueno ? (
+                                n.email_dueno
+                              ) : (
+                                <button className="admin-btn-editar" onClick={() => toggleAcceso(n.slug)}>
+                                  {accesoAbiertoSlug === n.slug ? "Cerrar" : "Crear acceso"}
+                                </button>
+                              )}
+                            </td>
                             <td>{n.plan ?? "—"}</td>
                             <td>{n.estado ?? "—"}</td>
                             <td>
@@ -839,9 +940,54 @@ export default function AdminPage() {
                               </div>
                             </td>
                           </tr>
+                          {accesoAbiertoSlug === n.slug && (
+                            <tr className="admin-tabla-edicion-row">
+                              <td colSpan={6}>
+                                <form
+                                  className="admin-edicion-form"
+                                  onSubmit={(e) => handleCrearAcceso(e, n.slug)}
+                                >
+                                  <div>
+                                    <h4 className="admin-edicion-bloque-title">Crear acceso del dueño</h4>
+                                    <div className="admin-edicion-grid">
+                                      <label>
+                                        Email del dueño
+                                        <input
+                                          type="email"
+                                          value={formAcceso.email}
+                                          onChange={(e) => handleChangeAcceso("email", e.target.value)}
+                                          required
+                                        />
+                                      </label>
+                                      <label>
+                                        Contraseña temporal
+                                        <input
+                                          value={formAcceso.password}
+                                          onChange={(e) => handleChangeAcceso("password", e.target.value)}
+                                          required
+                                        />
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div className="admin-edicion-acciones">
+                                    <button
+                                      type="submit"
+                                      className="admin-btn-guardar"
+                                      disabled={guardandoAcceso}
+                                    >
+                                      {guardandoAcceso ? "Creando..." : "Crear acceso"}
+                                    </button>
+                                    {errorAcceso && (
+                                      <p className="admin-mensaje admin-mensaje-error">{errorAcceso}</p>
+                                    )}
+                                  </div>
+                                </form>
+                              </td>
+                            </tr>
+                          )}
                           {editandoSlug === n.slug && (
                             <tr className="admin-tabla-edicion-row">
-                              <td colSpan={5}>
+                              <td colSpan={6}>
                                 <form className="admin-edicion-form" onSubmit={handleGuardarEdicion}>
                                   <div>
                                     <h4 className="admin-edicion-bloque-title">Información básica</h4>
@@ -880,37 +1026,16 @@ export default function AdminPage() {
                                             className="admin-logo-preview"
                                           />
                                         )}
-                                        <div className="admin-toggle-tabs">
-                                          <button
-                                            type="button"
-                                            className={`admin-toggle-tab ${
-                                              metodoLogoEdicion === "archivo" ? "is-active" : ""
-                                            }`}
-                                            onClick={() => setMetodoLogoEdicion("archivo")}
-                                          >
-                                            Subir archivo
-                                          </button>
-                                          <button
-                                            type="button"
-                                            className={`admin-toggle-tab ${
-                                              metodoLogoEdicion === "link" ? "is-active" : ""
-                                            }`}
-                                            onClick={() => setMetodoLogoEdicion("link")}
-                                          >
-                                            Pegar link
-                                          </button>
-                                        </div>
+                                        <ToggleMetodo
+                                          valor={metodoLogoEdicion}
+                                          onChange={setMetodoLogoEdicion}
+                                        />
                                         {metodoLogoEdicion === "archivo" ? (
-                                          <div className="admin-file-upload">
-                                            <input
-                                              type="file"
-                                              accept="image/jpeg,image/png,image/webp"
-                                              onChange={handleLogoChangeEdicion}
-                                            />
-                                            {subiendoLogoEdicion && (
-                                              <span className="admin-file-subiendo">Subiendo...</span>
-                                            )}
-                                          </div>
+                                          <BotonArchivo
+                                            accept="image/jpeg,image/png,image/webp"
+                                            subiendo={subiendoLogoEdicion}
+                                            onChange={handleLogoChangeEdicion}
+                                          />
                                         ) : (
                                           <div className="admin-link-field">
                                             <input
@@ -969,37 +1094,16 @@ export default function AdminPage() {
                                             }
                                           />
                                         )}
-                                        <div className="admin-toggle-tabs">
-                                          <button
-                                            type="button"
-                                            className={`admin-toggle-tab ${
-                                              metodoPdfEdicion === "archivo" ? "is-active" : ""
-                                            }`}
-                                            onClick={() => setMetodoPdfEdicion("archivo")}
-                                          >
-                                            Subir archivo
-                                          </button>
-                                          <button
-                                            type="button"
-                                            className={`admin-toggle-tab ${
-                                              metodoPdfEdicion === "link" ? "is-active" : ""
-                                            }`}
-                                            onClick={() => setMetodoPdfEdicion("link")}
-                                          >
-                                            Pegar link
-                                          </button>
-                                        </div>
+                                        <ToggleMetodo
+                                          valor={metodoPdfEdicion}
+                                          onChange={setMetodoPdfEdicion}
+                                        />
                                         {metodoPdfEdicion === "archivo" ? (
-                                          <div className="admin-file-upload">
-                                            <input
-                                              type="file"
-                                              accept="application/pdf"
-                                              onChange={handlePdfChangeEdicion}
-                                            />
-                                            {subiendoPdfEdicion && (
-                                              <span className="admin-file-subiendo">Subiendo...</span>
-                                            )}
-                                          </div>
+                                          <BotonArchivo
+                                            accept="application/pdf"
+                                            subiendo={subiendoPdfEdicion}
+                                            onChange={handlePdfChangeEdicion}
+                                          />
                                         ) : (
                                           <div className="admin-link-field">
                                             <input
@@ -1141,7 +1245,7 @@ export default function AdminPage() {
                       ))}
                       {negocios.length === 0 && (
                         <tr>
-                          <td colSpan={5} className="admin-tabla-vacio">
+                          <td colSpan={6} className="admin-tabla-vacio">
                             Todavía no hay negocios registrados.
                           </td>
                         </tr>
@@ -1150,6 +1254,26 @@ export default function AdminPage() {
                   </table>
                 </div>
               </div>
+
+              {credencialesAcceso && (
+                <div className="admin-card admin-credenciales">
+                  <h2 className="admin-card-title">Acceso creado</h2>
+                  <p className="admin-mensaje">
+                    Link: oaxlink.com/{credencialesAcceso.slug}
+                  </p>
+                  <p className="admin-credenciales-aviso">
+                    Copia estas credenciales y pásaselas al dueño — no se volverán a mostrar.
+                  </p>
+                  <div className="admin-credenciales-datos">
+                    <span>
+                      <strong>Email:</strong> {credencialesAcceso.email}
+                    </span>
+                    <span>
+                      <strong>Contraseña:</strong> {credencialesAcceso.password}
+                    </span>
+                  </div>
+                </div>
+              )}
             </>
           )}
 

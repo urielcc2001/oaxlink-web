@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { Negocio } from "@/lib/negocios";
+import { IconoTikTok } from "@/components/iconos";
 
 type TipoEvento = "click_google" | "click_wa" | "click_menu" | "click_social";
 
@@ -51,7 +52,7 @@ export function BotonesTarjeta({ negocio }: { negocio: Negocio }) {
           📘 Síguenos en Facebook
         </a>
       )}
-      {!negocio.facebook && negocio.instagram && (
+      {negocio.instagram && (
         <a
           href={negocio.instagram}
           target="_blank"
@@ -60,6 +61,17 @@ export function BotonesTarjeta({ negocio }: { negocio: Negocio }) {
           onClick={() => registrarClick(negocio.slug, "click_social")}
         >
           📸 Síguenos en Instagram
+        </a>
+      )}
+      {negocio.tiktok && (
+        <a
+          href={negocio.tiktok}
+          target="_blank"
+          rel="noreferrer"
+          className="btn btn-tiktok"
+          onClick={() => registrarClick(negocio.slug, "click_social")}
+        >
+          <IconoTikTok /> Síguenos en TikTok
         </a>
       )}
 

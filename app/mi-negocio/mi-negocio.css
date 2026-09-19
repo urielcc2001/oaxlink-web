@@ -201,7 +201,7 @@
 .mn-counter-card {
   position: relative;
   overflow: hidden;
-  padding: 1.5rem;
+  padding: 1.75rem;
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
@@ -237,7 +237,7 @@
 
 /* Tarjeta de gráfica */
 .mn-metrics-card {
-  padding: 2rem;
+  padding: 1.75rem;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -352,40 +352,116 @@
   margin-top: -0.4rem;
 }
 
+/* Estado vacío / neutro compartido (carga, "sin archivo", etc.) */
+.mn-estado-vacio {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
 .mn-pdf-actual {
   color: var(--gold);
   font-size: 0.85rem;
   width: fit-content;
+  transition: opacity 0.15s ease;
 }
 
 .mn-pdf-actual:hover {
   text-decoration: underline;
 }
 
-.mn-toggle-tabs {
+/* Toggle tipo pastilla (Subir archivo / Pegar link) */
+.mn-toggle {
+  position: relative;
   display: flex;
-  gap: 8px;
-}
-
-.mn-toggle-tab {
   background: var(--ink);
   border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 6px 12px;
-  color: var(--muted);
-  font-size: 0.82rem;
-  cursor: pointer;
+  border-radius: 999px;
+  padding: 3px;
 }
 
-.mn-toggle-tab.is-active {
-  border-color: var(--gold);
-  color: var(--gold);
+.mn-toggle-highlight {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  background: var(--gold);
+  border-radius: 999px;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mn-toggle-highlight.is-link {
+  transform: translateX(100%);
+}
+
+.mn-toggle-option {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+  padding: 7px 14px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+}
+
+.mn-toggle-option.is-active {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.mn-toggle-option:hover:not(.is-active) {
+  color: var(--text);
 }
 
 .mn-file-upload {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Botón de archivo personalizado (reemplaza el input nativo) */
+.mn-file-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ink-3);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 16px;
+  color: var(--text);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.mn-file-btn:hover {
+  border-color: var(--line-hover);
+  background: var(--ink-2);
+}
+
+.mn-file-btn:has(input:disabled) {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.mn-file-btn input[type="file"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .mn-link-field {
@@ -400,17 +476,6 @@
   border-radius: 8px;
   padding: 8px 10px;
   color: inherit;
-  font-size: 0.85rem;
-  font-family: inherit;
-}
-
-.mn-file-upload input[type="file"] {
-  flex: 1;
-  background: var(--ink);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 8px 10px;
-  color: var(--muted);
   font-size: 0.85rem;
   font-family: inherit;
 }
@@ -439,11 +504,27 @@
   font-weight: 600;
   font-size: 0.95rem;
   cursor: pointer;
+  transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+.mn-btn-guardar:hover:not(:disabled) {
+  filter: brightness(1.1);
 }
 
 .mn-btn-guardar:disabled {
   opacity: 0.6;
-  cursor: default;
+  cursor: not-allowed;
+}
+
+/* Foco visible consistente (anillo dorado, sin outline azul del navegador) */
+.mn-sidebar-item:focus-visible,
+.mn-btn-logout:focus-visible,
+.mn-btn-guardar:focus-visible,
+.mn-toggle-option:focus-visible,
+.mn-pdf-actual:focus-visible,
+.mn-file-btn:focus-within {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ink-2), 0 0 0 4px var(--gold);
 }
 
 /* RESPONSIVE: sidebar colapsa arriba */

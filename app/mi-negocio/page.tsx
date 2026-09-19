@@ -68,6 +68,54 @@ const FORM_VACIO: FormNegocio = {
   clabe: ""
 };
 
+type MetodoCarga = "archivo" | "link";
+
+function ToggleMetodo({ valor, onChange }: { valor: MetodoCarga; onChange: (valor: MetodoCarga) => void }) {
+  return (
+    <div className="mn-toggle">
+      <div className={`mn-toggle-highlight ${valor === "link" ? "is-link" : ""}`} />
+      <button
+        type="button"
+        className={`mn-toggle-option ${valor === "archivo" ? "is-active" : ""}`}
+        onClick={() => onChange("archivo")}
+      >
+        Subir archivo
+      </button>
+      <button
+        type="button"
+        className={`mn-toggle-option ${valor === "link" ? "is-active" : ""}`}
+        onClick={() => onChange("link")}
+      >
+        Pegar link
+      </button>
+    </div>
+  );
+}
+
+function BotonArchivo({
+  accept,
+  subiendo,
+  onChange
+}: {
+  accept: string;
+  subiendo: boolean;
+  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+}) {
+  return (
+    <div className="mn-file-upload">
+      <label className="mn-file-btn">
+        📎 Elegir archivo
+        <input type="file" accept={accept} onChange={onChange} disabled={subiendo} />
+      </label>
+      {subiendo ? (
+        <span className="mn-file-subiendo">Subiendo...</span>
+      ) : (
+        <span className="mn-estado-vacio">Ningún archivo seleccionado</span>
+      )}
+    </div>
+  );
+}
+
 export default function MiNegocioPage() {
   const router = useRouter();
   const [cargando, setCargando] = useState(true);
@@ -318,7 +366,7 @@ export default function MiNegocioPage() {
                 {metricas ? (
                   <GraficaSerie datos={metricas.serie} />
                 ) : (
-                  <p className="mn-mensaje">Cargando métricas...</p>
+                  <p className="mn-estado-vacio">Cargando métricas...</p>
                 )}
               </div>
             </>
@@ -347,27 +395,13 @@ export default function MiNegocioPage() {
                     {form.logo_url && (
                       <img src={form.logo_url} alt="Logo actual" className="mn-logo-preview" />
                     )}
-                    <div className="mn-toggle-tabs">
-                      <button
-                        type="button"
-                        className={`mn-toggle-tab ${metodoLogo === "archivo" ? "is-active" : ""}`}
-                        onClick={() => setMetodoLogo("archivo")}
-                      >
-                        Subir archivo
-                      </button>
-                      <button
-                        type="button"
-                        className={`mn-toggle-tab ${metodoLogo === "link" ? "is-active" : ""}`}
-                        onClick={() => setMetodoLogo("link")}
-                      >
-                        Pegar link
-                      </button>
-                    </div>
+                    <ToggleMetodo valor={metodoLogo} onChange={setMetodoLogo} />
                     {metodoLogo === "archivo" ? (
-                      <div className="mn-file-upload">
-                        <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleLogoChange} />
-                        {subiendoLogo && <span className="mn-file-subiendo">Subiendo...</span>}
-                      </div>
+                      <BotonArchivo
+                        accept="image/jpeg,image/png,image/webp"
+                        subiendo={subiendoLogo}
+                        onChange={handleLogoChange}
+                      />
                     ) : (
                       <div className="mn-link-field">
                         <input
@@ -418,27 +452,13 @@ export default function MiNegocioPage() {
                         onChange={(e) => handleChange("menu_pdf_label", e.target.value)}
                       />
                     )}
-                    <div className="mn-toggle-tabs">
-                      <button
-                        type="button"
-                        className={`mn-toggle-tab ${metodoPdf === "archivo" ? "is-active" : ""}`}
-                        onClick={() => setMetodoPdf("archivo")}
-                      >
-                        Subir archivo
-                      </button>
-                      <button
-                        type="button"
-                        className={`mn-toggle-tab ${metodoPdf === "link" ? "is-active" : ""}`}
-                        onClick={() => setMetodoPdf("link")}
-                      >
-                        Pegar link
-                      </button>
-                    </div>
+                    <ToggleMetodo valor={metodoPdf} onChange={setMetodoPdf} />
                     {metodoPdf === "archivo" ? (
-                      <div className="mn-file-upload">
-                        <input type="file" accept="application/pdf" onChange={handlePdfChange} />
-                        {subiendoPdf && <span className="mn-file-subiendo">Subiendo...</span>}
-                      </div>
+                      <BotonArchivo
+                        accept="application/pdf"
+                        subiendo={subiendoPdf}
+                        onChange={handlePdfChange}
+                      />
                     ) : (
                       <div className="mn-link-field">
                         <input
